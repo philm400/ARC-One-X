@@ -1,0 +1,24 @@
+{
+  "name": "power-meter",
+  "version": "1.0.0",
+  "description": "ARC One Power Meter PoC",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Phil Middlemass",
+  "license": "ISC",
+  "dependencies": {
+    "@abandonware/noble": "^1.9.2-9",
+    "express": "^4.17.1",
+    "object-scan": "^13.1.1",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.26.7",
+    "node-sass": "^4.14.0",
+    "gulp": "^4.0.2",
+    "gulp-nodemon": "^2.5.0",
+    "gulp-sass": "^4.1.0"
+  }
+}

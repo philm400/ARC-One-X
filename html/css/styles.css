@@ -1,0 +1,89 @@
+* {
+    box-sizing: border-box;
+}
+h1,h2,h3 {
+    color: #555;
+    font-weight: bold;
+    letter-spacing: 0rem;
+}
+h1:first-child,h2:first-child,h3:first-child {
+    margin-top: 0;
+}
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+p { font-size: 1.125rem; }
+body {
+    background: #fff;
+    font-family: 'Manrope', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    letter-spacing: 0.01rem;
+    color: #555;
+}
+.main {
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 3rem 0;
+}
+.row {
+    max-width: 1280px;
+    margin: 0 auto;
+    clear: both;
+}
+.row::after {
+    content: "";
+    display: table;
+    clear:both;
+}
+.col {
+    float: left;
+    padding: 0 1.25rem;
+    position: relative;
+}
+.flex-g {
+    display: flex;
+    flex-wrap: wrap;
+}
+.flex-g .col {
+    display: flex;
+    flex-wrap: wrap;
+}
+.full { width: 100%; }
+.half { width: 50%; }
+.third { width: 33.333%; }
+.quart { width: 25%; }
+
+#throt {
+    font-size: 4rem;
+    font-family: Teko, Arial;
+    color: #767676;
+    margin: 4rem 0 0 0;
+    padding: 0.25rem 2rem 0.15rem;
+    border: 2px solid #ddd;
+    text-align: center;
+}
+
+svg.throttle {
+    /* width: 100%;
+    height: auto; */
+}
+svg.throttle .tick {
+    fill: rgba(0,0,0,0.1);
+    transition: fill 0.1s ease-out;
+}
+svg.throttle .tick.red.on {
+    fill: rgba(192,57,43,1);
+}
+svg.throttle .tick.amber.on {
+    fill: rgb(245,159,31,1);
+}
+svg.throttle .tick.green.on {
+    fill: rgba(0,148,50,1);
+}
+svg.throttle .icon {
+    fill: rgba(0,0,0,0.3);
+}
