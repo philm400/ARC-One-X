@@ -167,12 +167,21 @@ async function enableTrackData() {
                 //console.log('Lane: '+newData[0]+'   diff: '+diff+'   newTick: '+newTick)
                 if (times[newData[0]].length > 1) { // check if the current car has started the race
                     if (newTick > times[newData[0]][times[newData[0]].length-1]) { // is this a new lap time? log it if yes
+                        var sid = sguid(8)
                         diff = newTick - times[newData[0]][times[newData[0]].length-1]; // calc the diff = the lap time in ms
                         times[newData[0]].push(newData[1] * 10); // push it to the ticks array
                         laps[newData[0]].push(new Date(diff).toISOString().slice(17, -1)); // create a lap time object snd store
                         console.log('Lane '+newData[0]+': '+laps[newData[0]][laps[newData[0]].length-1]);
                         pitTimes[newData[0]].inPit = true;// car is now in pitzone
                         pitTimes[newData[0]].pitClock = performance.now();
+                        io.emit('lap', {
+                            fn: 'lap',
+                            lane: newData[0],
+                            lapTime: parseInt(diff),
+                            raceTime: times[newData[0]][times[newData[0]].length-1],
+                            lapCount: laps[newData[0]].length-1,
+                            sguid: sid
+                        });
                     }
                     if (times[newData[0]].length == 2) {
                         console.log('Lane '+newData[0]+':  ---  Go, Go, Go!!!!');
@@ -182,6 +191,9 @@ async function enableTrackData() {
                         let pitDiff = tick - pitTimes[newData[0]].pitClock;
                         if (pitDiff > PIT_TRIGGER) { // PIT STOP: this is a pit stop that is ending
                             console.log('Lane '+newData[0]+':  --- PIT END - BACK RACING...');
+                            io.emit('lap', {fn: 'pit end',
+                                lane: newData[0],
+                            });
                         }
                         pitTimes[newData[0]].inPit = false;// car is out of pitzone
                         pitTimes[newData[0]].pitClock = 0;
@@ -192,6 +204,9 @@ async function enableTrackData() {
                         let pitDiff = tick - pitTimes[newData[0]].pitClock;
                         if ((pitDiff > PIT_TRIGGER) && (!pitTimes[newData[0]].io)) { // PIT STOP: if in pit zone more than 2s
                             console.log('Lane '+newData[0]+':  --- PIT STOP...');
+                            io.emit('lap', {fn: 'pit start',
+                                lane: newData[0]
+                            });
                             pitTimes[newData[0]].io = true;
                         }
                     }
@@ -215,6 +230,15 @@ async function disableTrackData() {
     } catch(error) {
         console.error(error)
     }
+}
+
+function sguid(len) {
+  var alpha = '0123456789abcdef';
+  var sid = '';
+  for (var i = 0; i < len; i++) {
+    sid += alpha.charAt(Math.floor(Math.random() * alpha.length));
+  }
+  return sid;
 }
 
 // Cleanup function on exit

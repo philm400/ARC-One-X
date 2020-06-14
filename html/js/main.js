@@ -5,6 +5,15 @@ const MAX_T = 62;
 const MIN_T = 0;
 var lastticksnum = 0;
 var event = new Event('change');
+var conText = `%c
+ ░░░░  ░░░░░   ░░░░░      ░░░░░  ░░░  ░░ ░░░░░░ ░░   ░░
+▒▒  ▒▒ ▒▒  ▒▒ ▒▒         ▒▒   ▒▒ ▒▒▒▒ ▒▒ ▒▒      ▒▒ ▒▒
+▒▒▒▒▒▒ ▒▒▒▒▒  ▒▒    ▒▒▒  ▒▒   ▒▒ ▒▒ ▒▒▒▒ ▒▒▒▒▒    ▒▒▒
+▓▓  ▓▓ ▓▓  ▓▓ ▓▓         ▓▓   ▓▓ ▓▓  ▓▓▓ ▓▓      ▓▓ ▓▓
+██  ██ ██  ██  █████      █████  ██   ██ ██████ ██   ██
+`
+
+console.log(conText, 'color: #1e90ff;')
 
 window.addEventListener('load', function() {
     throt.addEventListener('change', updateThrottle, false);
