@@ -6,6 +6,12 @@ var path = require('path');
 const {performance} = require('perf_hooks')
 var noble = require('@abandonware/noble');
 
+console.log('\n ░░░░  ░░░░░   ░░░░░    ░░░░░  ░░░  ░░ ░░░░░░   ░░   ░░');
+  console.log('▒▒  ▒▒ ▒▒  ▒▒ ▒▒       ▒▒   ▒▒ ▒▒▒▒ ▒▒ ▒▒        ▒▒ ▒▒');
+  console.log('▒▒▒▒▒▒ ▒▒▒▒▒  ▒▒       ▒▒   ▒▒ ▒▒ ▒▒▒▒ ▒▒▒▒▒  ▒▒  ▒▒▒');
+  console.log('▓▓  ▓▓ ▓▓  ▓▓ ▓▓       ▓▓   ▓▓ ▓▓  ▓▓▓ ▓▓        ▓▓ ▓▓');
+  console.log('██  ██ ██  ██  █████    █████  ██   ██ ██████   ██   ██\n');
+
 const PORT_NUMBER = 3000;
 var throtVals = '0,0';
 var deviceInfo = {};
@@ -22,11 +28,11 @@ var sf_bytes;
 var pit_bytes;
 var PIT_TRIGGER = 2000;
 
-  console.log('\n ░░░░  ░░░░░   ░░░░░      ░░░░░  ░░░  ░░ ░░░░░░ ░░   ░░');
-    console.log('▒▒  ▒▒ ▒▒  ▒▒ ▒▒         ▒▒   ▒▒ ▒▒▒▒ ▒▒ ▒▒      ▒▒ ▒▒');
-    console.log('▒▒▒▒▒▒ ▒▒▒▒▒  ▒▒    ▒▒▒  ▒▒   ▒▒ ▒▒ ▒▒▒▒ ▒▒▒▒▒    ▒▒▒');
-    console.log('▓▓  ▓▓ ▓▓  ▓▓ ▓▓         ▓▓   ▓▓ ▓▓  ▓▓▓ ▓▓      ▓▓ ▓▓');
-    console.log('██  ██ ██  ██  █████      █████  ██   ██ ██████ ██   ██\n');
+const POWER_LEVELS = [0x3f,0x3f,0x3f,0x3f,0x3f,0x3f];
+const NO_POWER_TIMER_TICKING = [0x01].concat(POWER_LEVELS);
+const POWER_ON_RACE_TRIGGER = [0x02].concat(POWER_LEVELS);
+const POWER_ON_RACING = [0x03].concat(POWER_LEVELS);
+const POWER_ON_TIMER_HALT = [0x04].concat(POWER_LEVELS);
 
 app.set('view engine','html');
 app.use(express.static(path.join(__dirname,'html')));
@@ -42,13 +48,22 @@ http.listen(PORT_NUMBER, function() {
 io.on('connection', (socket) => {
     console.log('-- Websocket Open');
     io.emit('device', deviceInfo);
+    // Socket.IO Listen for inbound events
+    socket.on('clientFN', (data) => {
+        if (data.fn == 'start') {
+        console.log('Race Start');
+        }
+        if (data.fn == 'stop') {
+        console.log('Race Stop');
+        }
+        if (data.fn == 'lap') {
+            console.log('Race Lap');
+            //console.table(laptime)
+            // io.emit('lap', {fn:'lap', lane:data.lane, lapTime:parseInt(laptime.lapms), raceTime:parseInt(laptime.raceTime), lapCount:laptime.lapnum, sguid:sid})
+        }
+        console.table(data);
+    });
 });
-
-const POWER_LEVELS = [0x3f,0x3f,0x3f,0x3f,0x3f,0x3f];
-const NO_POWER_TIMER_TICKING = [0x01].concat(POWER_LEVELS);
-const POWER_ON_RACE_TRIGGER = [0x02].concat(POWER_LEVELS);
-const POWER_ON_RACING = [0x03].concat(POWER_LEVELS);
-const POWER_ON_TIMER_HALT = [0x04].concat(POWER_LEVELS);
 
 
 noble.on('stateChange', async (state) => {

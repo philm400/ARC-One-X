@@ -1,89 +1,1273 @@
-* {
+*, *::before, *::after {
     box-sizing: border-box;
-}
-h1,h2,h3 {
-    color: #555;
-    font-weight: bold;
-    letter-spacing: 0rem;
-}
-h1:first-child,h2:first-child,h3:first-child {
-    margin-top: 0;
-}
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.5rem; }
-h4 { font-size: 1.25rem; }
-p { font-size: 1.125rem; }
-body {
-    background: #fff;
-    font-family: 'Manrope', Helvetica, Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    letter-spacing: 0.01rem;
-    color: #555;
-}
-.main {
-    max-width: 1280px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 3rem 0;
-}
-.row {
-    max-width: 1280px;
-    margin: 0 auto;
-    clear: both;
-}
-.row::after {
-    content: "";
-    display: table;
-    clear:both;
-}
-.col {
-    float: left;
-    padding: 0 1.25rem;
-    position: relative;
-}
-.flex-g {
-    display: flex;
-    flex-wrap: wrap;
-}
-.flex-g .col {
-    display: flex;
-    flex-wrap: wrap;
-}
-.full { width: 100%; }
-.half { width: 50%; }
-.third { width: 33.333%; }
-.quart { width: 25%; }
-
-#throt {
-    font-size: 4rem;
-    font-family: Teko, Arial;
-    color: #767676;
-    margin: 4rem 0 0 0;
-    padding: 0.25rem 2rem 0.15rem;
-    border: 2px solid #ddd;
-    text-align: center;
-}
-
-svg.throttle {
-    /* width: 100%;
-    height: auto; */
-}
-svg.throttle .tick {
-    fill: rgba(0,0,0,0.1);
-    transition: fill 0.1s ease-out;
-}
-svg.throttle .tick.red.on {
-    fill: rgba(192,57,43,1);
-}
-svg.throttle .tick.amber.on {
-    fill: rgb(245,159,31,1);
-}
-svg.throttle .tick.green.on {
-    fill: rgba(0,148,50,1);
-}
-svg.throttle .icon {
-    fill: rgba(0,0,0,0.3);
-}
+  }
+  h1,h2,h3 {
+      font-weight: bold;
+      margin: 0;
+  }
+  ul {
+      margin: 0; padding: 0;
+      list-style: none;
+  }
+  body {
+      background: #111;
+      background-size: cover;
+      font-family: "Teko", Helvetica, Arial, sans-serif;
+      margin:0;
+      padding: 0 calc(32px + (72 - 32) * ((100vw - 800px) / (1920 - 800)));
+      min-height: 100vh;
+      color:#fff;
+  }
+  .devOnly {
+      display:none !important;
+  }
+  .devModeOn .devOnly {
+      display: inherit !important;
+  }
+  #bkg {
+      background: url('/images/base-img-2.jpg') no-repeat center center;
+      background-size: cover;
+      position: absolute;
+      top:0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      transition: opacity 2s ease-out;
+  }
+  .timer {
+      font-family: "Teko", Helvetica, Arial, sans-serif;
+      font-weight: 300;
+      /* font-size: 4.583vw; */
+      font-size: calc(48px + (150 - 48) * ((100vw - 800px) / (1920 - 800)));
+      width: 100%;
+      margin: 2rem 0 0;
+  }
+  .row {
+      margin: 0;
+      clear: both;
+      width: 100%;
+  }
+  .row::after {
+      content: "";
+      display: table;
+      clear: both;
+  }
+  .col {
+      float: left;
+      padding: 0 2rem;
+      position: relative;
+      /* border: 1px solid #bbb;
+      background: #eee; */
+  }
+  .flex-grid {
+      display: flex;
+      flex-wrap: wrap;
+  }
+  .flex-grid .row {
+      flex-direction: row;
+  }
+  .flex-fill {
+      height: 100vh;
+  }
+  .flex-grid .col {
+      display: flex;
+      flex-direction: column;
+  }
+  .full { width: 100%; }
+  .half { width: 50%; }
+  .two-fifths { width: 40%; }
+  .one-fifth { width: 20%; }
+  
+  .aln-cent {
+      text-align: center;
+  }
+  .flex {
+      display: flex !important;
+  }
+  .hidden {
+      visibility: hidden;
+  }
+  .hide {
+      display: none !important;
+  }
+  .show {
+      display: block !important;
+  }
+  .op-25 {
+      opacity: 0.25;
+  }
+  
+  #logo {
+      z-index: 3;
+      position: absolute;
+      top:32%;
+      left:0;
+      right:0;
+      margin: 0 auto;
+      width: 300px;
+      height: auto;
+      filter: drop-shadow(0 5px 20px rgba(0,0,0,0.7));
+      opacity: 0;
+      transform-origin: 50% 50%;
+      animation-delay: 1.0s;
+      animation-name: UI-reveal-logo;
+      animation-duration: 1s;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+  }
+  #logo.in-game {
+      width: 200px;
+      top: 50px;
+  }
+  #enter-game-btn {
+      z-index: 3;
+      position: absolute;
+      top:52%;
+      left:0;
+      right:0;
+      margin: 0 auto;
+      max-width: 350px;
+      font-size: 3rem;
+      opacity: 0;
+      visibility: hidden;
+      border-radius: 5px;
+  }
+  #enter-game-btn.on {
+      opacity: 1;
+      visibility: visible;
+      transition: all 0.15s ease-out, opacity 1s ease-out;
+  }
+  
+  #ui-wrap {
+      position: relative;
+      z-index: 2;
+  }
+  #ui-wrap .row {
+      flex: 1;
+  }
+  #ui-top {
+      height: 22vh;
+  }
+  #ui-elem {
+      height: 78vh;
+      align-items: stretch;
+      padding-bottom: 100px;
+  }
+  .bkg-blur {
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      flex-grow: 1;
+  }
+  .btn {
+      position: relative;
+      display: block;
+      transform: skew(-15deg);
+      -webkit-appearance: none;
+      border:0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(15px);
+      font-size: 2rem;
+      color: #fff;
+      font-weight: 500;
+      width: 100%;
+      border-radius: 3px;
+      margin-bottom: 10px;
+      padding: 8px 20px;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.15s;
+      box-shadow: 0 3px 5px rgba(0,0,0,0.25);
+  }
+  .btn:hover {
+      background: rgba(0, 0, 0, 0.65);
+      transform: scale(1.15) skew(-15deg);
+      box-shadow: 0 10px 10px rgba(0,0,0,0.5);
+  }
+  .btn span {
+      display: block;
+      /* transform: skew(15deg); */
+  }
+  .btn.blue {
+      background: #3498db;
+  }
+  .btn.green {
+      background: #009432;
+  }
+  .btn.red {
+      background: #c0392b;
+  }
+  .btn.yellow {
+      background: #F79F1F;
+  }
+  .btn.grey {
+      background: #bdc3c7;
+      color: #2c3e50;
+  }
+  
+  .lane {
+      max-height: 100%;
+  }
+  .lane .wrap {
+      max-height:100%;
+      border-radius: 0 0 5px 5px;
+  }
+  .player-info {
+      position: relative;
+  }
+  .player-info .container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      padding: 20px 30px 16px 20px;
+      backdrop-filter: blur(10px);
+      background: rgba(180, 180, 180, 0.35);
+      width: 100%;
+  }
+  .player-info .container h2 {
+      position: absolute;
+      top: 0;
+      line-height: 1;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      left: -3.5rem;
+      padding: 20px 10px 16px 10px;
+      font-size: 3rem;
+      width: 3.5rem;
+      text-align: center;
+  }
+  .player-name {
+      font-weight: 300;
+      font-size: 3rem;
+      line-height: 1;
+      padding:0;
+      margin:0;
+  }
+  .lap-count {
+      font-size: 3rem;
+      font-weight: 300;
+      position: absolute;
+      line-height: 1;
+      right: 0;
+      bottom: 0;
+      text-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      padding: 20px 20px 16px;
+      backdrop-filter: blur(10px);
+      background: rgba(60, 60, 60, 0.35);
+  }
+  .lap-count small {
+      font-size: 2rem;
+  }
+  .lane.first .lap-count {
+      background: rgba(0, 148, 50, 0.9);
+  }
+  .lane.first .lap-count,
+  .lane.first .container h2 {
+      background: rgba(0, 148, 50, 0.9);
+  }
+  .lane.last .lap-count,
+  .lane.last .container h2 {
+      background: rgba(192, 57, 43, 0.9);
+  }
+  .lane.first .container {
+      background: rgba(0, 148, 50, 0.35);
+  }
+  .lane.last .container {
+      background: rgba(192, 57, 43, 0.35);
+  }
+  .lane.winner .wrap::before {
+      background-image: url(/images/checkered-b@2x.png);
+      background-repeat: no-repeat;
+      background-size: 250%;
+      background-position: left bottom;
+      content: '';
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left:0;
+      opacity: 0.5;
+      position: absolute;
+      z-index: -1;
+      animation-name: winner;
+      animation-duration: 0.5s;
+      animation-delay: 0.5s;
+      animation-iteration-count: 4;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+  }
+  
+  .lapsHeader {
+      display: flex;
+      margin: 0;
+      padding: 20px 1.125rem 2px;
+      font-size: 1.5rem;
+      font-weight: 500;
+      height: 59px;
+  }
+  .laps {
+      overflow-y: auto;
+      height: auto;
+      min-height: 80px;
+      max-height: calc(100% - 59px);
+  }
+  .laps li {
+      display: flex;
+      margin: 0 10px 0;
+      background: rgba(0,0,0,0.4);
+      font-size: 2rem;
+      font-weight: 300;
+      height: 0.01px;
+      opacity:0;
+      animation-name: newLap;
+      animation-duration: 0.5s;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+      position: relative;
+  }
+  .laps li.in {
+      height: 58px;
+      opacity: 1;
+      margin: 0 10px 3px;
+  }
+  .laps li > div {
+      padding: 7px 0.5rem 5px;
+      display: flex;
+      width: 100%;
+  }
+  .lapsHeader > span,
+  .laps li > div span {
+      flex: 1;
+  }
+  .lapsHeader > span:nth-child(1) {
+      padding-left: 0.5rem;
+      max-width: 90px;
+  }
+  .lapsHeader > span:nth-child(1) {
+      padding-left: 0.5rem;
+  }
+  .laps li > div span:nth-child(1) {
+      padding-left: 1.5rem;
+      max-width: 90px;
+  }
+  span.fastestLap {
+      visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+  }
+  .laps li.pb::after,
+  .laps li.fastest::after {
+      position: absolute;
+      content: " ";
+      width:20px;
+      height: 100%;
+      background: #be2edd;
+      top:0;
+      left:0;
+      opacity: 0;
+      animation-name: fastest;
+      animation-duration: 0.5s;
+      animation-delay: 0.5s;
+      animation-iteration-count: 4;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+  }
+  .laps li.pb::after {
+      background: #22a6b3;
+  }
+  .laps li.fastest::after {
+      background: #be2edd;
+  }
+  .laps li.pb .fastestLap,
+  .laps li.fastest .fastestLap {
+      background: #be2edd;
+      visibility: visible;
+      opacity: 0;
+      animation-name: fastest;
+      animation-duration: 0.5s;
+      animation-delay: 0.5s;
+      animation-iteration-count: 4;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+  }
+  .laps li.pb .fastestLap {
+      background: #22a6b3;
+  }
+  .laps li.fastest .fastestLap {
+      background: #be2edd;
+  }
+  .laps li.pb .fastestLap::after {
+      content: 'Personal Best'
+  }
+  .laps li.fastest .fastestLap::after {
+      content: 'Fastest Lap'
+  }
+  .central {
+      padding: 0 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      flex-direction: row;
+      flex-wrap: wrap;
+      max-height: 100%;
+  }
+  
+  .controls {
+      width: 100%;
+      align-self: flex-end;
+  }
+  
+  #newGame {
+      display: none;
+      position: absolute;
+      top:0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 4;
+      justify-content: center;
+  }
+  
+  .name-game-panel {
+      border-radius: 5px;
+      width: 50vw;
+      max-width: 35vw;
+      align-self: center;
+      padding: 1.5rem 3rem;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      visibility: hidden;
+  }
+  .name-game-panel  h1 {
+      text-align: center;
+      font-size: 3rem;
+  }
+  .name-game-panel  .form-row {
+      margin: 0 0 1rem;
+  }
+  .name-game-panel label {
+      display: block;
+      font-size: 1.5rem;
+  }
+  .name-game-panel input[type="text"],
+  .name-game-panel input[type="number"] {
+      text-align: left;
+      font-size: 2rem;
+      -webkit-appearance: none;
+      background: rgba(255,255,255,0.2);   
+      padding: 7px 1rem 5px;
+      font-weight: 300;
+      margin: 0 0.5rem 0 0;
+      border: none;
+      font-family: "Teko", Helvetica, Arial, sans-serif;
+      color: #fff;
+      display: inline-block;
+      width: 100%;
+  }
+  .name-game-panel input:focus {
+      background: rgba(0,0,0,0.5);
+  }
+  .name-game-panel input::-webkit-outer-spin-button,
+  .name-game-panel input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+  }
+  .name-game-panel input[type="number"] {
+      max-width: 5rem;
+  }
+  .name-game-panel .step {
+      text-decoration: none;
+      text-align: center;
+      font-size: 2rem;
+      background: rgba(255,255,255,0.2);   
+      padding: 7px 1rem 5px;
+      font-weight: 300;
+      margin: 0;
+      color: #fff;
+  }
+  .name-game-panel .step:hover {
+      background: rgba(0,0,0,0.5);
+  }
+  .name-game-panel .btn.grey {
+      display: inline-block;
+      width: auto;
+  }
+  
+  #startingLights {
+      display: none;
+      position: absolute;
+      top:0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 4;
+      justify-content: center;
+  }
+  
+  .lights-panel,
+  .go-panel  {
+      align-self: center;
+  }
+  .go-panel {
+      display: none;
+  }
+  .go-panel h1 {
+      font-size: 20rem;
+  }
+  .lights-panel .light {
+      width: 200px;
+      height: auto;
+  }
+  
+  .switch {
+      position: relative;
+      display: inline-block;
+      width: 92px;
+      height: 48px;
+    }  
+    /* Hide default HTML checkbox */
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }  
+    /* The slider */
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.2);
+      transition: .25s;
+    }  
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 40px;
+      width: 40px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .25s;
+    }
+      .switch::before {
+          content: 'ON';
+          font-size: 1.5rem;
+          font-weight: 300;
+          position: absolute;
+          z-index: 1;
+          left: 15px;
+          line-height: 1;
+          top: 12px;
+      }
+      .switch::after {
+          content: 'OFF';
+          font-size: 1.5rem;
+          font-weight: 300;
+          position: absolute;
+          z-index: -1;
+          right: 12px;
+          line-height: 1;
+          top: 12px;
+    }
+    input:focus + .slider {
+      outline: -webkit-focus-ring-color auto 5px;
+      outline: -moz-focus-ring-color auto 5px;
+      outline: focus-ring-color auto 5px;
+    }
+    input:checked + .slider {
+      background-color: #009432;
+    }  
+    input:checked + .slider:before {
+      transform: translateX(44px);
+    }
+  
+    #mobile-rotate {
+      display: none;
+    }
+  
+  #devTools {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,255,255, 0.95);
+      color: #444;
+      font-family: Menlo, Monaco, 'Courier New', monospace;
+      font-size: 1rem;
+      font-weight: bold;
+      line-height: 1;
+      border-radius: 2rem;
+      -webkit-appearance: none;
+      border: none;
+      z-index: 10;
+      width: 2.25rem;
+      height: 2.25rem;
+      cursor: pointer;
+  }
+  
+  /* PHONE LANDSCAPE SHOW ROTATE */
+  @media all and (max-width: 959px) and (orientation: landscape) {
+      body {
+          min-height: 100vh;
+          overflow: hidden;
+      }
+      #mobile-rotate {
+          display: block;
+          z-index: 10;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+      }
+      #mobile-rotate p {
+          margin: 0.5rem 0 0;
+          font-size: 1.125rem;
+          font-weight: 300;
+      }
+      #enter-game-btn {
+          display: none;
+      }
+      #logo {
+          display: none;
+      }
+  }
+  /* TABLET LANDSCAPE */
+  @media all and (min-width: 800px) and (max-width: 1279px) {
+      body {
+          padding: 0 2rem;
+      }
+      #ui-elem {
+          padding-bottom: 3rem;
+      }
+      .col {
+          padding: 0 0.75rem;
+      }
+      .central {
+          padding: 0 0.75rem;
+      }
+      .btn {
+          font-size: 1.25rem;
+      }
+      .player-info .container {
+          padding: 15px 80px 12px 15px;
+      }
+      .player-info .container h2 {
+          left: -2rem;
+          padding: 15px 5px 12px 5px;
+          font-size: 1.75rem;
+          width: 2rem;
+      }
+      .player-name {
+          font-size: 1.75rem;
+      }
+      .lap-count {
+          font-size: 2rem;
+          padding: 13px 15px 10px;
+      }
+      .lap-count small {
+          font-size: 1.25rem;
+      }
+      .lapsHeader {
+          padding: 15px 0.875rem 2px;
+          font-size: 1.125rem;
+          height: 45px;
+      }
+      .lapsHeader > span:nth-child(1) {
+          max-width: 65px;
+      }
+      .laps li {
+          font-size: 1.5rem;
+          animation-name: newLapTablet;
+      }
+      .laps li > div span:nth-child(1) {
+          padding-left: 0.875rem;
+          max-width: 65px;
+      }
+      .laps li.pb::after, .laps li.fastest::after {
+          width: 10px;
+      }
+      span.fastestLap {
+          font-size: 1.125rem;
+      }
+      .timer {
+          font-size: calc(59px + (105 - 59) * ((100vw - 800px) / (1279 - 800)))
+      }
+      #logo {
+          top: 28%;
+      }
+      #logo.in-game {
+          width: 150px;
+          top: 25px;
+      }
+      .new-game-options {
+          display: flex;
+          flex-wrap: wrap;
+      }
+      .name-game-panel {
+          width: 100%;
+          max-width: 70vw;
+          padding: 1.25rem 3rem;
+      }
+      .name-game-panel h1 {
+          font-size: 2.5rem;
+      }
+      .name-game-panel .form-row:nth-child(-n+2),
+      .name-game-panel .form-row:nth-child(n+4) {
+          width: 50%;
+      }
+      .name-game-panel .form-row:nth-child(n+3):nth-child(-n+4) {
+          width: 100%;
+      }
+      .name-game-panel .form-row:nth-child(5) {
+          order: 6;
+          text-align: right;
+          margin-top: 20px;
+      }
+      .name-game-panel .form-row:nth-child(6) {
+          order: 5;
+          text-align: left;
+          margin-top: 20px;
+      }
+      .lights-panel .light {
+          width: 150px;
+      }
+  }
+  
+  /* PHONE PORTRIAT AND INCLUDING TABLET */
+  @media all and (min-width: 320px) and (max-width: 1024px) and (orientation: portrait) {
+      body {
+          padding: 0;
+      }
+      #ui-top {
+          height: 20vh;
+      }
+      #ui-elem {
+          height: 80vh;
+          padding-bottom: 1rem;
+      }
+      .lane {
+          height: 40%;
+      }
+      .lane,
+      .central {
+          width: 100%;
+      }
+      .central {
+          flex-direction: row;
+          height: 20%;
+          padding-bottom: 7%;
+      }
+      .timer {
+          position: fixed;
+          top: 0;
+          right: 2rem;
+          width: 10rem;
+          font-size: 3rem;
+          line-height: 1;
+          margin: 1rem 0 0 0;
+          text-align: left;
+      }
+      .controls {
+          align-self: center;
+          text-align: center;
+      }
+      .controls .btn {
+          width: auto;
+          display: inline-block;
+          font-size: 0.875rem;
+          padding: 8px 16px 8px 32px;
+          margin-right: 5px;
+      }
+      .player-info .container {
+          padding: 10px 50px 8px 15px;
+      }
+      .player-info .container h2 {
+          left: -1.5rem;
+          padding: 10px 5px 8px 5px;
+          font-size: 1.75rem;
+          max-width: 1.5rem;
+      }
+      .player-name {
+          font-size: 1.75rem;
+      }
+      .lap-count {
+          font-size: 2rem;
+          padding: 8px 12px 6px;
+      }
+      .lap-count small {
+          font-size: 1.25rem;
+      }
+  }
+  
+  
+  
+  /* PHONE PORTRIAT UP TO TABLET */
+  @media all and (min-width: 320px) and (max-width: 599px) and (orientation: portrait) {
+      .lapsHeader {
+          padding: 15px 0.875rem 2px;
+          font-size: 1rem;
+          height: 45px;
+      }
+      .lapsHeader > span:nth-child(1) {
+          max-width: 65px;
+      }
+      .laps li {
+          font-size: 1.125rem;
+          animation-name: newLapMobile;
+      }
+      .laps li > div {
+          padding: 5px;
+      }
+      .laps li > div span:nth-child(1) {
+          padding-left: 0.875rem;
+          max-width: 65px;
+      }
+      .laps li.pb::after, .laps li.fastest::after {
+          width: 10px;
+      }
+      span.fastestLap {
+          font-size: 1rem;
+      }
+      .player-info .container {
+          padding: 10px 50px 8px 34px;
+      }
+      .player-info .container h2 {
+          left: 0;
+      }
+      #logo.in-game {
+          width: 70px;
+          top: 15px;
+          left: 2rem;
+          margin: 0;
+      }
+      .timer {
+          top: 5px;
+          right: 1.5rem;
+          width: 8rem;
+          font-size: 3.5rem;
+          margin: 0;
+      }
+      #ui-top {
+          height: 16vh;
+      }
+      #ui-elem {
+          height: 83vh;
+      }
+      #enter-game-btn {
+          max-width: 250px;
+          font-size: 2rem;
+      }
+      #logo {
+          top: 30%;
+          width: 250px;
+      }
+  }
+  
+  
+  
+  /* TABLET PORTRAIT */
+  @media all and (min-width: 600px) and (max-width: 999px) and (orientation: portrait) {
+      body {
+          padding: 0 2rem;
+      }
+      #ui-elem {
+          padding-bottom: 2rem;
+      }
+      .lane,
+      .central {
+          width: 100%;
+      }
+      #logo {
+          top: 30%;
+      }
+      #logo.in-game {
+          transition: all 0.5s ease-out;
+          width: 150px;
+          top: 40px;
+          left: 4rem;
+          margin: 0;
+      }
+      .timer {
+          right: 4rem;
+          width: 17rem;
+          font-size: 8rem;
+          margin: 1rem 0 0 0;
+      }
+      .controls .btn {
+          font-size: 1.25rem;
+          padding: 8px 16px 8px 32px;
+          margin-right: 5px;
+      }
+      .player-info .container {
+          padding: 15px 80px 12px 15px;
+      }
+      .player-info .container h2 {
+          left: -2rem;
+          padding: 15px 5px 12px 5px;
+          font-size: 2rem;
+          max-width: 2rem;
+      }
+      .player-name {
+          font-size: 2rem;
+      }
+      .lap-count {
+          font-size: 2.25rem;
+          padding: 13px 15px 10px;
+      }
+      .lap-count small {
+          font-size: 1.25rem;
+      }
+      .new-game-options {
+          display: flex;
+          flex-wrap: wrap;
+      }
+      .name-game-panel {
+          width: 100%;
+          max-width: 70vw;
+          padding: 1.25rem 3rem;
+      }
+      .name-game-panel h1 {
+          font-size: 2.5rem;
+      }
+      .name-game-panel .form-row:nth-child(-n+2),
+      .name-game-panel .form-row:nth-child(n+4) {
+          width: 50%;
+      }
+      .name-game-panel .form-row:nth-child(n+3):nth-child(-n+4) {
+          width: 100%;
+      }
+      .name-game-panel .form-row:nth-child(5) {
+          order: 6;
+          text-align: right;
+          margin-top: 20px;
+      }
+      .name-game-panel .form-row:nth-child(6) {
+          order: 5;
+          text-align: left;
+          margin-top: 20px;
+      }
+      .lights-panel .light {
+          width: 120px;
+      }
+      .lane.winner .wrap::before {
+          background-size: 145%;
+      }
+  }
+  
+  
+  /* TABLET PORTRAIT */
+  @media all and (min-width: 1000px) and (orientation: portrait) {
+      body {
+          padding: 0 4rem;
+      }
+      #ui-top {
+          height: 15vh;
+      }
+      #ui-elem {
+          height: 85vh;
+          padding-bottom: 4rem;
+      }
+      .lane {
+          height: 42%;
+      }
+      .central {
+          height: 16%;
+          padding-bottom: 5%;
+      }
+      .controls .btn {
+          width: auto;
+          display: inline-block;
+          font-size: 1.5rem;
+          padding: 8px 20px 8px 36px;
+          margin-right: 5px;
+      }
+      .laps li {
+          font-size: 2rem;
+          animation-name: newLap;
+      }
+      span.fastestLap {
+          font-size: 1.5rem;
+      }
+      .lapsHeader {
+          font-size: 1.5rem;
+          font-weight: 500;
+          height: 59px;
+      }
+      .player-info .container {
+          padding: 12px 70px 8px 15px;
+      }
+      .player-name {
+          font-size: 2.5rem;
+      }
+      .player-info .container h2 {
+          left: -2rem;
+          padding: 12px 5px 8px 5px;
+          font-size: 2.5rem;
+          max-width: 2rem;
+      }
+      .lap-count {
+          font-size: 3rem;
+          padding: 8px 20px 4px;
+      }
+      .lap-count small {
+          font-size: 2rem;
+      }
+      #logo.in-game {
+          width: 150px;
+          top: 25px;
+          left: 3rem;
+          margin: 0;
+      }
+      #logo {
+          top: 35%;
+      }
+      #enter-game-btn {
+          top: 50%;
+          max-width: 300px;
+      }
+      .timer {
+          top: 0;
+          right: 5rem;
+          width: 16.5rem;
+          font-size: 8rem;
+          margin: 0;
+      }
+  }
+  
+  
+    /* ANIMATIONS */
+  .animate {
+      display: block;
+  }
+  .opacityUI-clear {
+      animation-name: opacityUI-clear;
+      animation-duration: 0.25s;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+  }
+  .reverse-opacityUI-clear {
+      animation-name: reverse-opacityUI-clear;
+      animation-duration: 0.25s;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+  }
+  .blurUI-20 {
+      animation-name: blurUI-20;
+      animation-duration: 0.25s;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+  }
+  .reverse-blurUI-20 {
+      animation-name: reverse-blurUI-20;
+      animation-duration: 0.25s;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+  }
+  .UIReveal {
+      animation-name: UI-reveal;
+      animation-duration: 0.25s;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+      visibility: visible;
+  }
+  .UIExit {
+      animation-name: UI-exit;
+      animation-duration: 0.25s;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+  }
+  
+  @keyframes winner {
+      0% {
+          opacity: 0.5;
+      }
+      50% {
+          opacity: 0;
+      }
+      100% {
+          opacity: 0.5;
+      }
+  }
+  @keyframes fastest {
+      0% {
+          opacity: 1;
+      }
+      50% {
+          opacity: 0;
+      }
+      100% {
+          opacity: 1;
+      }
+  }
+  @keyframes newLap {
+      0% {
+          opacity: 0;
+          height: 0.01px;
+          margin: 0 10px 0;
+      }
+      33% {
+          opacity: 0;
+          height: 58px;
+          margin: 0 10px 3px;
+      }
+      66% {
+          opacity: 1;
+          height: 58px;
+          margin: 0 10px 3px;
+      }
+      83% {
+          background: rgba(255,255,255,1);
+          opacity: 1;
+          height: 58px;
+          margin: 0 10px 3px;
+      }
+      100% {        
+          background: rgba(0,0,0,0.4);
+          opacity: 1;
+          height: 58px;
+          margin: 0 10px 3px;
+      }
+  }
+  @keyframes opacityUI-clear {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+  }
+  @keyframes reverse-opacityUI-clear {
+      0% {
+          opacity: 0;
+      }
+      100% {
+          opacity: 1;
+      }
+  }
+  @keyframes blurUI-20 {
+      0% {
+          filter: blur(0px);
+          opacity: 1;
+      }
+      100% {
+          filter: blur(20px);
+          opacity: 0.75;
+      }
+  }
+  @keyframes reverse-blurUI-20 {
+      0% {
+          filter: blur(20px);
+          opacity: 0.75;
+      }
+      100% {
+          filter: blur(0px);
+          opacity: 1;
+      }
+  }
+  @keyframes UI-reveal {
+      0% {
+          filter: blur(20px);
+          opacity: 0px;
+          transform: scale(1.2);
+      }
+      100% {
+          filter: blur(0px);
+          opacity: 1;
+          transform: scale(1);
+      }
+  }
+  @keyframes UI-exit {
+      0% {
+          filter: blur(0px);
+          opacity: 1;
+          transform: scale(1);
+      }
+      100% {
+          filter: blur(20px);
+          opacity: 0px;
+          transform: scale(1.2);
+          visibility: hidden;
+      }
+  }
+  @keyframes UI-reveal-logo {
+      0% {
+          filter: blur(20px);
+          opacity: 0px;
+          transform: scale(1.2);
+          filter: drop-shadow(0 5px 20px rgba(0,0,0,0.7));
+      }
+      100% {
+          filter: blur(0px);
+          opacity: 1;
+          transform: scale(1);
+          filter: drop-shadow(0 5px 20px rgba(0,0,0,0.7));
+      }
+  }
+  
+  @keyframes newLapTablet {
+      0% {
+          opacity: 0;
+          height: 0.01px;
+          margin: 0 10px 0;
+      }
+      33% {
+          opacity: 0;
+          height: 46px;
+          margin: 0 10px 3px;
+      }
+      66% {
+          opacity: 1;
+          height: 46px;
+          margin: 0 10px 3px;
+      }
+      83% {
+          background: rgba(255,255,255,1);
+          opacity: 1;
+          height: 46px;
+          margin: 0 10px 3px;
+      }
+      100% {        
+          background: rgba(0,0,0,0.4);
+          opacity: 1;
+          height: 46px;
+          margin: 0 10px 3px;
+      }
+  }
+  @keyframes newLapMobile {
+      0% {
+          opacity: 0;
+          height: 0.01px;
+          margin: 0 10px 0;
+      }
+      33% {
+          opacity: 0;
+          height: 34px;
+          margin: 0 10px 2px;
+      }
+      66% {
+          opacity: 1;
+          height: 34px;
+          margin: 0 10px 2px;
+      }
+      83% {
+          background: rgba(255,255,255,1);
+          opacity: 1;
+          height: 34px;
+          margin: 0 10px 2px;
+      }
+      100% {        
+          background: rgba(0,0,0,0.4);
+          opacity: 1;
+          height: 34px;
+          margin: 0 10px 2px;
+      }
+  }
