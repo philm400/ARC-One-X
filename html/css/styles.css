@@ -41,7 +41,7 @@
       /* font-size: 4.583vw; */
       font-size: calc(48px + (150 - 48) * ((100vw - 800px) / (1920 - 800)));
       width: 100%;
-      margin: 2rem 0 0;
+      margin: 7rem 0 0;
   }
   .row {
       margin: 0;
@@ -146,17 +146,14 @@
   #ui-wrap .row {
       flex: 1;
   }
-  #ui-top {
-      height: 22vh;
-  }
   #ui-elem {
-      height: 78vh;
+      height: 100vh;
       align-items: stretch;
-      padding-bottom: 100px;
+      padding: 130px 0 50px;
   }
   .bkg-blur {
       background: rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       flex-grow: 1;
   }
   .btn {
@@ -206,6 +203,7 @@
   }
   
   .lane {
+      padding: 0 1rem;
       max-height: 100%;
   }
   .lane .wrap {
@@ -228,9 +226,8 @@
       position: absolute;
       top: 0;
       line-height: 1;
-      background: rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(10px);
-      left: -3.5rem;
+      background: rgba(0, 0, 0, 0.60);
+      left: 0;
       padding: 20px 10px 16px 10px;
       font-size: 3rem;
       width: 3.5rem;
@@ -240,7 +237,7 @@
       font-weight: 300;
       font-size: 3rem;
       line-height: 1;
-      padding:0;
+      padding: 0 80px 0 3.5rem;
       margin:0;
   }
   .lap-count {
@@ -295,6 +292,49 @@
       animation-fill-mode: forwards;
       animation-timing-function: ease-out;
   }
+
+.carStats {
+    display: flex;
+    padding: 0.75rem 1.125rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    height: 
+}
+.carStats .throt,
+.carStats .fuel {
+    padding-right: 2rem;
+}
+svg.fuelGauge,
+svg.throttle,
+svg.tyreWear {
+    width: auto;
+    height: 100%;
+    max-height: 48px;
+    display: block;
+}
+svg.fuelGauge .tick,
+svg.throttle .tick,
+svg.tyreWear .tyre {
+    fill: rgba(255,255,255,0.1);
+    transition: fill 0.1s ease-out;
+}
+svg.fuelGauge.red .tick.on,
+svg.throttle .tick.red.on,
+svg.tyreWear .tyre.red.on  {
+    fill: rgba(192,57,43,1);
+}
+svg.fuelGauge.amber .tick.on,
+svg.throttle .tick.amber.on,
+svg.tyreWear .tyre.amber.on {
+    fill: rgb(245,159,31,1);
+}
+svg.fuelGauge.green .tick.on,
+svg.throttle .tick.green.on,
+svg.tyreWear .tyre.green.on {
+    fill: rgba(0,148,50,1);
+}
+svg .icon {
+    fill: rgba(255,255,255,0.3);
+}
   
   .lapsHeader {
       display: flex;
@@ -308,7 +348,7 @@
       overflow-y: auto;
       height: auto;
       min-height: 80px;
-      max-height: calc(100% - 59px);
+      max-height: calc(100% - 132px);
   }
   .laps li {
       display: flex;
@@ -747,11 +787,8 @@
       body {
           padding: 0;
       }
-      #ui-top {
-          height: 20vh;
-      }
       #ui-elem {
-          height: 80vh;
+          height: 100vh;
           padding-bottom: 1rem;
       }
       .lane {
@@ -969,11 +1006,8 @@
       body {
           padding: 0 4rem;
       }
-      #ui-top {
-          height: 15vh;
-      }
       #ui-elem {
-          height: 85vh;
+          height: 100vh;
           padding-bottom: 4rem;
       }
       .lane {

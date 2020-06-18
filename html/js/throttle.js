@@ -1,9 +1,12 @@
 var socket;
 var throt = document.querySelector('#throt');
-var throttleticks = document.querySelectorAll('.throttle .tick');
+var throtObj = [
+     document.querySelector('#lane1 .throttle'),
+     document.querySelector('#lane2 .throttle')
+]
 const MAX_T = 62;
 const MIN_T = 0;
-var lastticksnum = 0;
+var lastticksnum = [0,0];
 var event = new Event('change');
 var conText = `%c
  ░░░░  ░░░░░   ░░░░░    ░░░░░  ░░░  ░░ ░░░░░░   ░░   ░░
@@ -28,34 +31,36 @@ window.addEventListener('load', function() {
 });
 
 function updateThrottle(data) {
-    let throtval = data.lane1;
-    percent = Math.round(((throtval - MIN_T) * 100) / (MAX_T - MIN_T));
-    ticksnum = Math.round(percent / 5);
-    console.log('Val: '+throtval+'  |  Percent: '+percent+'%  |  ticks: '+ticksnum);
-    var count = 0;
-    if (ticksnum > lastticksnum) {
-        let diff = ticksnum - lastticksnum;
-        var ticks = document.querySelectorAll('.throttle .tick:not(.on)');
-        var loop = setInterval(() => {
-            ticks[count].classList.add('on')
-            count++;
-            if (count === diff) {
-                clearInterval(loop);
-            }
-        },10);
-    } else if (ticksnum < lastticksnum) {
-        let diff = lastticksnum - ticksnum;
-        var ticks = document.querySelectorAll('.throttle .tick.on');
-        var tickLen = ticks.length-1;
-        var loop = setInterval(() => {
-            ticks[tickLen-count].classList.remove('on')
-            count++;
-            if (count === diff) {
-                clearInterval(loop);
-            }
-        },10);
-    }
-    lastticksnum = ticksnum;
+    data.forEach((val, idx, arr) => {
+        let throtval = val;
+        percent = Math.round(((throtval - MIN_T) * 100) / (MAX_T - MIN_T));
+        ticksnum = Math.round(percent / 5);
+        console.log('Val: '+throtval+'  |  Percent: '+percent+'%  |  ticks: '+ticksnum);
+        var count = 0;
+        if (ticksnum > lastticksnum[idx]) {
+            let diff = ticksnum - lastticksnum[idx];
+            var ticks = throtObj[idx].querySelectorAll('.tick:not(.on)');
+            var loop = setInterval(() => {
+                ticks[count].classList.add('on')
+                count++;
+                if (count === diff) {
+                    clearInterval(loop);
+                }
+            },10);
+        } else if (ticksnum < lastticksnum[idx]) {
+            let diff = lastticksnum[idx] - ticksnum;
+            var ticks = throtObj[idx].querySelectorAll('.tick.on');
+            var tickLen = ticks.length-1;
+            var loop = setInterval(() => {
+                ticks[tickLen-count].classList.remove('on')
+                count++;
+                if (count === diff) {
+                    clearInterval(loop);
+                }
+            },10);
+        }
+        lastticksnum[idx] = ticksnum;
+    });
 }
 
 function randNum(min, max) { // min and max included 

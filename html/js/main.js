@@ -12,6 +12,9 @@ var options = {
         lane2: { count: 0, pb: 99999999}
     }
 };
+const MAX_T = 62;
+const MIN_T = 0;
+var lastticksnum = [0,0];
 
 const bkg = document.querySelector('#bkg');
 const ui = document.querySelector('#ui-wrap');
@@ -30,6 +33,10 @@ const lightSwitch = document.querySelector('#lights-toggle');
 const logo = document.querySelector('#logo');
 const startBtn = document.querySelector('#enter-game-btn');
 const lapCountEl = (data) => `${data.count}/<small>${options.laps}</small>`; 
+var throtObj = [
+     document.querySelector('#lane1 .throttle'),
+     document.querySelector('#lane2 .throttle')
+]
 
 window.addEventListener('load', function() {
     console.log('Page Loaded')
@@ -37,6 +44,10 @@ window.addEventListener('load', function() {
     socket.on('lap', function (data) {
         console.log(data);
         lapTime(data);
+    });
+    socket.on('throttle', function (data) {
+        console.log(data);
+        updateThrottle(data)
     });
     updateTimer(new Date(0).toISOString().slice(14, 21));
      
@@ -59,10 +70,12 @@ function lapTime(data) {
                                 <span class="lapNum">${data.lapCount}</span>
                                 <span class="lapTime">${diff}</span>
                                 <span class="raceTime">${runtime}</span>
+                                <span class="avgSpd">${avgSpeed}</span>
                                 <span class="fastestLap"></span></div>
                             </li>`;                   
     diff = new Date(data.lapTime).toISOString().slice(17, -1);   
-    runtime = new Date(data.raceTime).toISOString().slice(14, -1);            
+    runtime = new Date(data.raceTime).toISOString().slice(14, -1); 
+    let avgSpeed = '---';       
     let li = parser.parseFromString(lapElement(), 'text/html');
     audio[3].currentTime = 0;
     audio[3].play();
@@ -169,6 +182,39 @@ function updateFastestLap(lane, data) {
             lapsLane2.firstChild.classList.add('fastest');
         }
     }
+}
+
+function updateThrottle(data) {
+    data.forEach((val, idx) => {
+        let throtval = val;
+        percent = Math.round(((throtval - MIN_T) * 100) / (MAX_T - MIN_T));
+        ticksnum = Math.round(percent / 5);
+        console.log('Val: '+throtval+'  |  Percent: '+percent+'%  |  ticks: '+ticksnum);
+        var count = 0;
+        if (ticksnum > lastticksnum[idx]) {
+            let diff = ticksnum - lastticksnum[idx];
+            var ticks = throtObj[idx].querySelectorAll('.tick:not(.on)');
+            var loop = setInterval(() => {
+                ticks[count].classList.add('on')
+                count++;
+                if (count === diff) {
+                    clearInterval(loop);
+                }
+            },10);
+        } else if (ticksnum < lastticksnum[idx]) {
+            let diff = lastticksnum[idx] - ticksnum;
+            var ticks = throtObj[idx].querySelectorAll('.tick.on');
+            var tickLen = ticks.length-1;
+            var loop = setInterval(() => {
+                ticks[tickLen-count].classList.remove('on')
+                count++;
+                if (count === diff) {
+                    clearInterval(loop);
+                }
+            },10);
+        }
+        lastticksnum[idx] = ticksnum;
+    });
 }
 
 

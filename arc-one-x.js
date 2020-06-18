@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
         if (data.fn == 'lap') {
             console.log('Race Lap');
             //console.table(laptime)
-            // io.emit('lap', {fn:'lap', lane:data.lane, lapTime:parseInt(laptime.lapms), raceTime:parseInt(laptime.raceTime), lapCount:laptime.lapnum, sguid:sid})
+            io.emit('lap', {fn:'lap', lane:data.lane, lapTime:2345, raceTime:48372, lapCount:12, sguid:sguid(8)})
         }
         console.table(data);
     });
@@ -136,7 +136,7 @@ async function enableThrottle() {
                 const bytes = new Uint8Array([data[1],data[2]]); // LANE throttle data lanes 1-2 | ARC One - 0x00 - 0xC3(0-64)
                 const newVals = bytes.toString();
                 if (newVals != throtVals) {
-                    io.emit('throttle', {lane1:bytes[0], lane2:bytes[1]});
+                    io.emit('throttle', [bytes[0], bytes[1]]);
                     throtVals = newVals;
                     //console.log(bytes);
                 }
