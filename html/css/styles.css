@@ -107,7 +107,8 @@
       margin: 0 auto;
       width: 400px;
       height: auto;
-      filter: drop-shadow(0 5px 20px rgba(0,0,0,0.7));
+	  filter: drop-shadow(0 5px 20px rgba(0,0,0,0.7));
+	  backface-visibility: hidden;
       opacity: 0;
       transform-origin: 50% 50%;
       animation-delay: 1.0s;
@@ -153,7 +154,8 @@
   }
   .bkg-blur {
       background: rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(12px);
+	  backdrop-filter: blur(12px);
+	  backface-visibility: hidden;
       flex-grow: 1;
   }
   .btn {
@@ -163,7 +165,8 @@
       -webkit-appearance: none;
       border:0;
       background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(15px);
+	  backdrop-filter: blur(15px);
+	  backface-visibility: hidden;
       font-size: 2rem;
       color: #fff;
       font-weight: 500;
@@ -218,7 +221,8 @@
       bottom: 0;
       left: 0;
       padding: 20px 30px 16px 20px;
-      backdrop-filter: blur(10px);
+	  backdrop-filter: blur(10px);
+	  backface-visibility: hidden;
       background: rgba(180, 180, 180, 0.35);
       width: 100%;
   }
@@ -249,7 +253,8 @@
       bottom: 0;
       text-shadow: 0 3px 10px rgba(0,0,0,0.25);
       padding: 20px 20px 16px;
-      backdrop-filter: blur(10px);
+	  backdrop-filter: blur(10px);
+	  backface-visibility: hidden;
       background: rgba(60, 60, 60, 0.35);
   }
   .lap-count small {
@@ -438,10 +443,13 @@ svg .icon {
       background: #be2edd;
   }
   .laps li.pb .fastestLap::after {
-      content: 'Personal Best'
+      content: 'PB'
   }
   .laps li.fastest .fastestLap::after {
-      content: 'Fastest Lap'
+      content: 'Fastest'
+  }
+  .laps li small {
+      font-size: 1.5rem;
   }
   .central {
       padding: 0 1.25rem;
@@ -515,7 +523,8 @@ svg .icon {
       padding: 1.5rem 3rem;
       background: rgba(0, 0, 0, 0.35);
       /* backdrop-filter: blur(10px); */  /* Causing Chrome redraw flickering with inputs */
-      visibility: hidden;
+	  visibility: hidden;
+	  backface-visibility: hidden;
   }
   .name-game-panel  h1 {
       text-align: center;

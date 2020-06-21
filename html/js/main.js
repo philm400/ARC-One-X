@@ -9,12 +9,26 @@ var options = {
     fueluse: false,
     tyrewear: false,
     units: 'mph',
-    speed: 'scale',
+    speed: 'scaled up',
     tracklen: 2.2,
     fastest: 99999999,
     lapCount: {
-        lane1: { count: 0, pb: 99999999},
-        lane2: { count: 0, pb: 99999999}
+        lane1: { count: 0, pb: 99999999, telemetry: {
+            lapTimes: [0],
+            raceTimes: [0],
+            avgSpeeds: [0],
+            throttle: [], // Future use
+            fuelBurn: [],
+            tyreWear: []
+        }},
+        lane2: { count: 0, pb: 99999999, telemetry: {
+            lapTimes: [0],
+            raceTimes: [0],
+            avgSpeeds: [0],
+            throttle: [], // Future use
+            fuelBurn: [],
+            tyreWear: []
+        }}
     },
     deviceInfo: {}
 };
@@ -40,6 +54,11 @@ const p2 = document.querySelector('#i-player2');
 const l1 = document.querySelector('#lane1');
 const l2 = document.querySelector('#lane2');
 const lightSwitch = document.querySelector('#lights-toggle');
+const fuelToogle = document.querySelector('#fuel-toggle');
+const tyreToogle = document.querySelector('#tyres-toggle');
+const trackLength = document.querySelector('#i-trackLen');
+const speedUnit = document.querySelector('#i-speedUnits');
+const speedScale = document.querySelector('#i-speedScale');
 const logo = document.querySelector('#logo');
 const startBtn = document.querySelector('#enter-game-btn');
 const loaderRipp = document.querySelector('.loaderRipple');
@@ -100,9 +119,22 @@ function lapTime(data) {
                                 <span class="avgSpd">${avgSpeed}</span>
                                 <span class="fastestLap"></span></div>
                             </li>`;                   
-    diff = new Date(data.lapTime).toISOString().slice(17, -1);   
-    runtime = new Date(data.raceTime).toISOString().slice(14, -1); 
-    let avgSpeed = '---';       
+    let diff = new Date(data.lapTime).toISOString().slice(17, -1);   
+    let runtime = new Date(data.raceTime).toISOString().slice(14, -1); 
+    let seconds = data.lapTime/1000;
+    let mps = options.tracklen / seconds; // Calc Meters per second to convert into chosen speed
+    let speed = 0;
+    if (options.units == 'mph') { // MPH
+        speed = mps * 2.237;
+    } else if (options.units == 'kph') { // KPH
+        speed = mps * 3.6;
+    } else { // MPS
+        speed = mps;
+    }
+    if (options.speed == 'scaled up') {
+        speed = speed * 32;
+    }
+    let avgSpeed = speed.toFixed(1) + '<small> '+options.units+'</small>';       
     let li = parser.parseFromString(lapElement(), 'text/html');
     audio[3].currentTime = 0;
     audio[3].play();
@@ -119,6 +151,10 @@ function lapTime(data) {
         if (lapCount == options.laps) { // check if winner and end race
             endRace(1);
         }
+        // Add telemetry data to log
+        options.lapCount.lane1.telemetry.lapTimes.push(seconds);
+        options.lapCount.lane1.telemetry.raceTimes.push(data.raceTime / 1000);
+        options.lapCount.lane1.telemetry.avgSpeeds.push(speed.toFixed(1));
     } else if (data.lane == 2) {
         var lapCount = options.lapCount.lane2.count += 1; // update lane lap counter
         document.querySelector('#lane2 .lap-count').innerHTML = lapCountEl({count: lapCount});
@@ -132,6 +168,10 @@ function lapTime(data) {
         if (lapCount == options.laps) { // check for winner and end race
             endRace(2);
         }
+        // Add telemetry data to log
+        options.lapCount.lane2.telemetry.lapTimes.push(seconds);
+        options.lapCount.lane2.telemetry.raceTimes.push(data.raceTime / 1000);
+        options.lapCount.lane2.telemetry.avgSpeeds.push(speed.toFixed(1));
     }                 
 }
 
@@ -356,14 +396,15 @@ function minLap() {
     lapOption.value = newLaps;
 }
 function saveOptions() {
-    options.laps = lapOption.value;
-    options.player1 = p1.value;
+    options.laps = lapOption.value;  // # Laps
+    options.player1 = p1.value;  // Driver names
     options.player2 = p2.value;
-    if (lightSwitch.checked) {
-        options.lights = true;
-    } else {
-        options.lights = false;
-    }
+    options.lights = (lightSwitch.checked) ?  true : false;  // Starting Lights
+    options.fueluse = (fuelToogle.checked) ?  true : false;  // Fuel use
+    options.tyrewear = (tyreToogle.checked) ?  true : false;  // Tyre wear
+    options.units = speedUnit.options[speedUnit.selectedIndex].value;  // Speed units
+    options.speed = speedScale.options[speedScale.selectedIndex].value;  // Speed scale
+    options.tracklen = trackLength.value; // Track lenth in Meters
     updatePlayers();
     resetLapCount();
     console.table(options);
@@ -375,8 +416,22 @@ function updatePlayers() {
 }
 function resetLapCount() {
     options.lapCount = {
-        lane1: { count: 0, pb: 99999999},
-        lane2: { count: 0, pb: 99999999}
+        lane1: { count: 0, pb: 99999999, telemetry: {
+            lapTimes: [0],
+            raceTimes: [0],
+            avgSpeeds: [0],
+            throttle: [], // Future use
+            fuelBurn: [],
+            tyreWear: []
+        }},
+        lane2: { count: 0, pb: 99999999, telemetry: {
+            lapTimes: [0],
+            raceTimes: [0],
+            avgSpeeds: [0],
+            throttle: [], // Future use
+            fuelBurn: [],
+            tyreWear: []
+        }}
     };
     options.fastest = 99999999;
     document.querySelector('#lane1 .lap-count').innerHTML = lapCountEl({count: 0});
