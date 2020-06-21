@@ -8,8 +8,9 @@
     </head>
     <body>
         <div id="bkg" class="op-25"></div>
-        <img src="/images/scx-logo.svg" id="logo" alt="Logo">
+        <img src="/images/arc-one-x-logo.svg" id="logo" alt="Logo">
         <a href="#" class="btn green" id="enter-game-btn" onClick="enterGame();"><span>Lets Race ></span></a>
+        <div class="loaderRipple"><div></div><div></div></div>
         <div id="ui-wrap" class="hidden">
             <div class="row flex-grid" id="ui-elem">
                 <div id="lane1" class="col two-fifths lane">
@@ -90,7 +91,7 @@
                         <a href="#" class="btn blue" onClick="raceOptions();"><span>Race Options</span></a>
                         <a href="#" class="btn green" onClick="startRace();"><span>Start</span></a>
                         <a href="#" class="btn red" onClick="stopRace();"><span>Stop &amp; Reset</span></a>
-                        <!-- <a href="#" class="btn red" onClick="stopRace();"><span>Stop</span></a> -->
+                        <a href="#" class="btn yellow" onClick="resetRace();"><span>Reset</span></a>
                         <a href="#" class="btn yellow devOnly" onClick="devLap(1);"><span>Lap - L1</span></a>
                         <a href="#" class="btn yellow devOnly" onClick="devLap(2);"><span>Lap - L2</span></a>
                     </nav>
@@ -178,13 +179,6 @@
                         <input name="i-num-laps" id="i-num-laps" type="number" value=20> <a href="#" class="step neg" onClick="minLap();">-</a> <a href="#" class="step plus" onClick="addLap();">+</a>
                     </div>
                     <div class="form-row">
-                        <label for="i-num-lights">Starting Lights</label>
-                        <label class="switch">
-                            <input type="checkbox" id="lights-toggle" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="form-row">
                         <label for >Driver 1 Name</label>
                         <input name="i-player1" id="i-player1" type="text" value="Driver 1">
                     </div>
@@ -192,11 +186,48 @@
                         <label for >Driver 2 Name</label>
                         <input name="i-player2" id="i-player2" type="text" value="Driver 2">
                     </div>
-                    <div class="form-row aln-cent">
-                        <a href="#" class="btn green" onClick="saveOptions();"><span>Save &amp; Continue</span></a>
+                    <div class="form-row">
+                        <label>Starting Lights</label>
+                        <label class="switch">
+                            <input type="checkbox" id="lights-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>Fuel Usage</label>
+                        <label class="switch">
+                            <input type="checkbox" id="fuel-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>Tyre Wear</label>
+                        <label class="switch">
+                            <input type="checkbox" id="tyres-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label for="i-trackLen">Track Length</label>
+                        <input name="i-trackLen" id="i-trackLen" type="number" value="2.2" class="sml"> <p class="inline">meters</p>
+                    </div>
+                    <div class="form-row">
+                        <label for="i-speedUnits">Speed Units</label>
+                        <select class="select-css" id="i-speedUnits">
+                            <option value="mph">MPH</option>
+                            <option value="kph">KPH</option>
+                            <option value="m/s">Meters/Second</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="i-speedScale">Speed Scale</label>
+                        <select class="select-css" id="i-speedScale">
+                            <option value="actual">Actual speed</option>
+                            <option value="scaled">Scaled up</option>
+                        </select>
                     </div>
                     <div class="form-row aln-cent">
-                        <a href="#" class="btn grey" onClick="closeOptions();"><span>Close</span></a>
+                        <a href="#" class="btn green" onClick="saveOptions();"><span>Save &amp; Continue</span></a>
                     </div>
                 </div>
             </div>
@@ -217,7 +248,20 @@
             </svg>
             <p>Please turn your phone to portrait</p>
         </div>
-        <button id="devTools" onClick="devMode()">{}</button>
+        <div id="BLEError">
+            <div class="ble-error-panel">
+                <h1>Connection Error</h1>
+                <p>Sorry, a Scalextric ARC One device could be found</p>                
+                <div class="form-row aln-cent">
+                    <a href="#" class="btn green" onClick="retryError();"><span>Try Again?</span></a>
+                </div>
+                <div class="form-row aln-cent">
+                    <a href="#" class="btn grey" onClick="closeError();"><span>Close</span></a>
+                </div>
+            </div>
+        </div>
+        <div id="BLEicon" class="hide"><img src="/images/ble-connected.svg"></div>
+        <button id="devTools" class="hide" onClick="devMode()">{}</button>
 
         <!-- our main JS - TImer Class and interrupt handlers-->
         <script src="/js/main.js"></script>

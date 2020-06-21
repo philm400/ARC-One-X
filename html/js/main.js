@@ -6,11 +6,17 @@ var options = {
     player1: 'Driver 1',
     player2: 'Driver 2',
     lights: true,
+    fueluse: false,
+    tyrewear: false,
+    units: 'mph',
+    speed: 'scale',
+    tracklen: 2.2,
     fastest: 99999999,
     lapCount: {
         lane1: { count: 0, pb: 99999999},
         lane2: { count: 0, pb: 99999999}
-    }
+    },
+    deviceInfo: {}
 };
 const MAX_T = 62;
 const MIN_T = 0;
@@ -19,11 +25,15 @@ var lastticksnum = [0,0];
 const bkg = document.querySelector('#bkg');
 const ui = document.querySelector('#ui-wrap');
 const newg = document.querySelector('#newGame');
+const bleErr = document.querySelector('#BLEError');
+const bleIcon = document.querySelector('#BLEicon');
+const devTools = document.querySelector('#devTools');
 const lightOverlay = document.querySelector('#startingLights');
 const lightPanel = document.querySelector('#startingLights .lights-panel');
 const goPanel = document.querySelector('#startingLights .go-panel');
 const lightSet = document.querySelectorAll('#startingLights .light');
 const newgpanel = document.querySelector('.name-game-panel');
+const bleerrorpanel = document.querySelector('.ble-error-panel');
 const lapOption = document.querySelector('#i-num-laps');
 const p1 = document.querySelector('#i-player1');
 const p2 = document.querySelector('#i-player2');
@@ -32,6 +42,7 @@ const l2 = document.querySelector('#lane2');
 const lightSwitch = document.querySelector('#lights-toggle');
 const logo = document.querySelector('#logo');
 const startBtn = document.querySelector('#enter-game-btn');
+const loaderRipp = document.querySelector('.loaderRipple');
 const lapCountEl = (data) => `${data.count}/<small>${options.laps}</small>`; 
 var throtObj = [
      document.querySelector('#lane1 .throttle'),
@@ -49,13 +60,29 @@ window.addEventListener('load', function() {
         console.log(data);
         updateThrottle(data)
     });
+    socket.on('pit start', function (data) {
+        console.log(data);
+    });
+    socket.on('pit end', function (data) {
+        console.log(data);
+    });
+    socket.on('ble status', function (data) {
+        console.log(data);
+        if (data.fn == 'error') {
+            showErrorPanel();
+        }
+        if (data.fn == 'connected') {
+            loaderRipp.classList.add('hide');
+            startBtn.classList.add('on');
+            bleIcon.classList.remove('hide');
+        }
+    });
+    socket.on('deviceInfo', function (data) {
+        console.table(data);
+        options.deviceInfo = data;
+    });
+    socket.emit('clientFN', {fn:'ble connect'});
     updateTimer(new Date(0).toISOString().slice(14, 21));
-     
-    logo.addEventListener('animationend', showStart);
-    function showStart() {
-        startBtn.classList.add('on');
-        logo.removeEventListener('animationend', showStart);
-    }
 });
 
 const timerEl = document.querySelector("#timer_lane_1");
@@ -139,11 +166,11 @@ function endRace(lane) {
 }
 function stopRace() {
     options.running = false;
-    socket.emit('clientFN', {fn:'stop'}); // trigger the server side clock
+    socket.emit('clientFN', {fn:'stop'}); // trigger the server stop
     worker.postMessage({function: 'stop'}); // Stop the timer in worker.
-    resetRace();
 }
 function resetRace() {
+    socket.emit('clientFN', {fn:'reset'}); // trigger the server reset
     worker.postMessage({function: 'reset'}); // reset the timer in worker.
     updateTimer(new Date(0).toISOString().slice(14, 21));
     resetLapCount();
@@ -292,6 +319,32 @@ function showLights() { // handle button event to show New Game panel
     }
 }
 
+function retryError() {
+    socket.emit('clientFN', {fn:'ble connect retry'}); // trigger the server retry
+    closeError();
+}
+function showErrorPanel() { // Show error panel
+    bkg.classList.add('blurUI-20');
+    ui.classList.add('opacityUI-clear');
+    bkg.addEventListener('animationend', handleAnimationEnd);
+
+    function handleAnimationEnd() {
+        bleErr.classList.add('flex');
+        bleerrorpanel.classList.add('UIReveal');
+        bkg.removeEventListener('animationend', handleAnimationEnd);
+    }
+}
+function closeError() {     // close error panel
+    bleerrorpanel.classList.add('UIExit');
+    bleerrorpanel.addEventListener('animationend', handleAnimationEnd);
+    function handleAnimationEnd() {
+        bleErr.classList.remove('flex');
+        bleerrorpanel.classList.remove('UIExit','UIReveal');
+        returnUIBKG();
+        bleerrorpanel.removeEventListener('animationend', handleAnimationEnd);
+    }
+}
+
 /* OPTIONS FUNCTIONS */
 function addLap() {
     var laps = parseInt(lapOption.value) + 1;
@@ -334,6 +387,7 @@ function enterGame() {
     resetLapCount();
     startBtn.classList.remove('on');
     setTimeout(() => {
+        devTools.classList.remove('hide');
         bkg.classList.remove('op-25');
         logo.classList.add('in-game');
         ui.classList.remove('hidden');
