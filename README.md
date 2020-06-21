@@ -1,7 +1,7 @@
 # ARC One-X
 ## A Node.js / BLE Scalextric web app for the ARC One power base
 A race management web app for the Scalextric ARC One power base by connecting via Bluetooth (BLE via Noble) and using the data it broadcasts
-![RMS Screen shot](https://github.com/philm400/Raspberry-Pi-Node.js-Scalextric-Race-Web-App/blob/master/private/screens/demo-screen-03.jpg?raw=true)
+![RMS Screen shot](https://raw.githubusercontent.com/philm400/ARC-One-X/master/assets/ui.jpg)
 
 The core principle is to harness the data and increase the fun via a modern browser and big screen TV - This runs on my 4K 55" TV in the family room.
 
