@@ -451,6 +451,23 @@ svg .icon {
   .laps li small {
       font-size: 1.5rem;
   }
+  .pitIndicator {
+	max-height: calc(100% - 72px);
+	height: 100%;
+	width: 100%;
+	display: none;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	align-items: center;
+    justify-content: center;
+  }
+  .pitIndicator img {
+	margin: 0 0 3rem;
+  }
+  .pitIndicator .inPit {
+	animation: pitFlash 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  }
   .central {
       padding: 0 1.25rem;
       display: flex;
@@ -501,6 +518,17 @@ svg .icon {
         opacity: 0;
     }
   }
+  @keyframes pitFlash {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+  }
   #BLEError,
   #newGame {
       display: none;
@@ -511,6 +539,9 @@ svg .icon {
       height: 100vh;
       z-index: 4;
       justify-content: center;
+  }
+  .ble-error-panel {
+	backdrop-filter: blur(10px);
   }
   .ble-error-panel,
   .name-game-panel {

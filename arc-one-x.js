@@ -22,7 +22,16 @@ var charTrack;
 var throtSetup = false;
 var trackSetup = false;
 var times = [0,[0],[0]];
-var pitTimes = [0,{inPit:false,pitClock:0,io:false},{inPit:false,pitClock:0,io:false}]
+var pitTimes = [0,{
+    inPit:false,
+    pitClock:0,
+    io:false
+},
+{
+    inPit:false,
+    pitClock:0,
+    io:false
+}]
 var laps = [0,[],[]];
 var RACING = false;
 var sf_bytes;
@@ -51,6 +60,7 @@ http.listen(PORT_NUMBER, function() {
 io.on('connection', (socket) => {
     console.log('-- Websocket Open');
     // Socket.IO Listen for inbound events
+    console.log('Waiting for BLE coontection request from client')
     socket.on('clientFN', (data) => {
         if (data.fn == 'start') {
             console.log('Race Start');
@@ -72,6 +82,7 @@ io.on('connection', (socket) => {
         if (data.fn == 'ble connect retry') {
             console.log('BLE Retry Connection');
             BLEError = 0;
+            noble.startScanningAsync(null, false);
         }
         if (data.fn == 'ble connect') {
             BLEError = 0;
@@ -85,8 +96,11 @@ io.on('connection', (socket) => {
 });
 
 async function BLEstartup() {
+    console.log('BLEstartup() {'+BLEStatus+'}')
     if (!BLEStatus) {
+        console.log('in IF()');
         noble.on('stateChange', async (state) => {
+            console.log('State: '+state)
             if (state === 'poweredOn') {
                 await noble.startScanningAsync(null, false);
             }
@@ -127,6 +141,9 @@ async function BLEstartup() {
         io.emit('ble status', {fn:'connected'});
         io.emit('deviceInfo', deviceInfo);
     }
+    noble.on('warning', async (message) => {
+        console.log('WARNING: '+message);
+    });
 }
 
 async function setDeviceInfo(serv) {
@@ -257,6 +274,7 @@ async function enableTrackData() {
                                 console.log('Lane '+newData[0]+':  --- PIT END - BACK RACING...');
                                 io.emit('lap', {fn: 'pit end',
                                     lane: newData[0],
+                                    pitLength: pitDiff
                                 });
                             }
                             pitTimes[newData[0]].inPit = false;// car is out of pitzone
