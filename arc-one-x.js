@@ -272,7 +272,7 @@ async function enableTrackData() {
                             let pitDiff = tick - pitTimes[newData[0]].pitClock;
                             if (pitDiff > PIT_TRIGGER) { // PIT STOP: this is a pit stop that is ending
                                 console.log('Lane '+newData[0]+':  --- PIT END - BACK RACING...');
-                                io.emit('lap', {fn: 'pit end',
+                                io.emit('lap', {fn: 'pit exit',
                                     lane: newData[0],
                                     pitLength: pitDiff
                                 });

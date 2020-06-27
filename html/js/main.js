@@ -6,6 +6,7 @@ var options = {
     player1: 'Driver 1',
     player2: 'Driver 2',
     lights: true,
+    pitStopLen: 10000,
     fueluse: false,
     tyrewear: false,
     units: 'mph',
@@ -67,6 +68,14 @@ var throtObj = [
      document.querySelector('#lane1 .throttle'),
      document.querySelector('#lane2 .throttle')
 ]
+var pitLog = [0,0,0];
+var pitTimers = [0,0,0];
+
+function pi(data) {
+    console.log(data);
+    pitLog[data.lane] = new PitStop(data);
+    pitLog[data.lane].start();
+}
 
 window.addEventListener('load', function() {
     console.log('Page Loaded')
@@ -77,13 +86,16 @@ window.addEventListener('load', function() {
     });
     socket.on('throttle', function (data) {
         console.log(data);
-        updateThrottle(data)
+        updateThrottle(data);
     });
     socket.on('pit start', function (data) {
         console.log(data);
+        pitLog[data.lane] = new PitStop(data);
+        pitLog[data.lane].start();
     });
-    socket.on('pit end', function (data) {
+    socket.on('pit exit', function (data) {
         console.log(data);
+        pitLog[data.lane].exit();
     });
     socket.on('ble status', function (data) {
         console.log(data);
@@ -173,6 +185,22 @@ function lapTime(data) {
         options.lapCount.lane2.telemetry.raceTimes.push(data.raceTime / 1000);
         options.lapCount.lane2.telemetry.avgSpeeds.push(speed.toFixed(1));
     }                 
+}
+
+function pitStopEnd(data) {
+    var pitFlag,lapData;
+    if (data.lane == 1) {
+        lapData = document.querySelector('#console_lane_1');
+        pitFlag = l1.querySelector('.pitIndicator');
+    } else {
+        lapData = document.querySelector('#console_lane_2');
+        pitFlag = l2.querySelector('.pitIndicator');
+    }
+    let pitCrew = pitFlag.querySelector('.pitProgress .bar');
+    lapData.classList.remove('hide');
+    pitFlag.classList.remove('flex');
+    pitFlag.querySelector('.inPit').classList.remove('hide');
+    pitFlag.querySelector('.gogogo').classList.add('hide');
 }
 
 worker.onmessage = function(e) {

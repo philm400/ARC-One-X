@@ -165,7 +165,6 @@
       -webkit-appearance: none;
       border:0;
       background: rgba(0, 0, 0, 0.5);
-	  backdrop-filter: blur(15px);
 	  backface-visibility: hidden;
       font-size: 2rem;
       color: #fff;
@@ -460,13 +459,27 @@ svg .icon {
 	bottom: 0;
 	left: 0;
 	align-items: center;
-    justify-content: center;
+	justify-content: center;
+	flex-direction: column;
   }
   .pitIndicator img {
 	margin: 0 0 3rem;
   }
   .pitIndicator .inPit {
 	animation: pitFlash 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  }
+  .pitIndicator .pitProgress {
+	  width: 75%;
+	  background: rgba(255,255,255,0.15);
+	  height: 5px;
+	  border-radius: 2px;
+  }
+  .pitIndicator .pitProgress .bar {
+	display: block;
+	width: 0;
+	height: 5px;
+	border-radius: 2px;
+	background: rgba(255,255,255,0.75);
   }
   .central {
       padding: 0 1.25rem;

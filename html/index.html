@@ -83,6 +83,11 @@
                             <span>Status</span>
                         </div>
                         <ul id="console_lane_1" class="laps"></ul>
+                        <div class="pitIndicator">
+                            <img src="/images/pit-stop.svg" class="inPit" alt="Pit Stop">
+                            <img src="/images/go-go-go.svg" class="gogogo hide" alt="Go Go Go">
+                            <div class="pitProgress"><span class="bar"></span></div>
+                        </div>
                     </div>
                 </div>
                 <div class="one-fifth central">
@@ -169,6 +174,7 @@
                         <div class="pitIndicator">
                             <img src="/images/pit-stop.svg" class="inPit" alt="Pit Stop">
                             <img src="/images/go-go-go.svg" class="gogogo hide" alt="Go Go Go">
+                            <div class="pitProgress"><span class="bar"></span></div>
                         </div>
                     </div>
                 </div>
@@ -265,6 +271,7 @@
         <button id="devTools" class="hide" onClick="devMode()">{}</button>
 
         <!-- our main JS - TImer Class and interrupt handlers-->
+        <script src="/js/classes.js"></script>
         <script src="/js/main.js"></script>
         <!-- include socket.io client side script -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
