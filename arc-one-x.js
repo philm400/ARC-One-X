@@ -36,7 +36,7 @@ var laps = [0,[],[]];
 var RACING = false;
 var sf_bytes;
 var pit_bytes;
-var PIT_TRIGGER = 2000;
+var PIT_TRIGGER = 1000;
 var BLEError = 0;
 var BLEStatus = false;
 
@@ -201,7 +201,8 @@ async function enableThrottle() {
             charThrot.on('data', (data, isNotification) => {
                 const bytes = new Uint8Array([data[1],data[2]]); // LANE throttle data lanes 1-2 | ARC One - 0x00 - 0xC3(0-64)
                 const newVals = bytes.toString();
-                if ((newVals != throtVals) && RACING) {
+                //if ((newVals != throtVals) && RACING) {
+                if (RACING) {
                     io.emit('throttle', [bytes[0], bytes[1]]);
                     throtVals = newVals;
                     //console.log(bytes);
@@ -272,7 +273,7 @@ async function enableTrackData() {
                             let pitDiff = tick - pitTimes[newData[0]].pitClock;
                             if (pitDiff > PIT_TRIGGER) { // PIT STOP: this is a pit stop that is ending
                                 console.log('Lane '+newData[0]+':  --- PIT END - BACK RACING...');
-                                io.emit('lap', {fn: 'pit exit',
+                                io.emit('pit exit', {
                                     lane: newData[0],
                                     pitLength: pitDiff
                                 });
@@ -286,7 +287,7 @@ async function enableTrackData() {
                             let pitDiff = tick - pitTimes[newData[0]].pitClock;
                             if ((pitDiff > PIT_TRIGGER) && (!pitTimes[newData[0]].io)) { // PIT STOP: if in pit zone more than 2s
                                 console.log('Lane '+newData[0]+':  --- PIT STOP...');
-                                io.emit('lap', {fn: 'pit start',
+                                io.emit('pit start', {
                                     lane: newData[0]
                                 });
                                 pitTimes[newData[0]].io = true;

@@ -7,8 +7,8 @@ var options = {
     player2: 'Driver 2',
     lights: true,
     pitStopLen: 10000,
-    fueluse: false,
-    tyrewear: false,
+    fueluse: 0,
+    tyrewear: 0,
     units: 'mph',
     speed: 'scaled up',
     tracklen: 2.2,
@@ -18,17 +18,29 @@ var options = {
             lapTimes: [0],
             raceTimes: [0],
             avgSpeeds: [0],
-            throttle: [], // Future use
-            fuelBurn: [],
-            tyreWear: []
+            throttle: [0], // Future use
+            fuelBurn: {
+                current: 100,
+                logs: []
+            },
+            tyreWear: {
+                current: 100,
+                logs: []
+            }
         }},
         lane2: { count: 0, pb: 99999999, telemetry: {
             lapTimes: [0],
             raceTimes: [0],
             avgSpeeds: [0],
             throttle: [], // Future use
-            fuelBurn: [],
-            tyreWear: []
+            fuelBurn: {
+                current: 100,
+                logs: []
+            },
+            tyreWear: {
+                current: 100,
+                logs: []
+            }
         }}
     },
     deviceInfo: {}
@@ -55,8 +67,8 @@ const p2 = document.querySelector('#i-player2');
 const l1 = document.querySelector('#lane1');
 const l2 = document.querySelector('#lane2');
 const lightSwitch = document.querySelector('#lights-toggle');
-const fuelToogle = document.querySelector('#fuel-toggle');
-const tyreToogle = document.querySelector('#tyres-toggle');
+const fuelToogle = document.querySelector('#i-fuelrate');
+const tyreToogle = document.querySelector('#i-tyrerate');
 const trackLength = document.querySelector('#i-trackLen');
 const speedUnit = document.querySelector('#i-speedUnits');
 const speedScale = document.querySelector('#i-speedScale');
@@ -68,28 +80,38 @@ var throtObj = [
      document.querySelector('#lane1 .throttle'),
      document.querySelector('#lane2 .throttle')
 ]
+var fuelObj = [
+     document.querySelector('#lane1 .fuelGauge'),
+     document.querySelector('#lane2 .fuelGauge')
+]
 var pitLog = [0,0,0];
 var pitTimers = [0,0,0];
 
-function pi(data) {
+/* function pi(data) {
     console.log(data);
     pitLog[data.lane] = new PitStop(data);
     pitLog[data.lane].start();
-}
+} */
 
 window.addEventListener('load', function() {
     console.log('Page Loaded')
     socket = io(); // Initialise socket.io-client to connect to host
     socket.on('lap', function (data) {
-        console.log(data);
+        console.log('Lap: '+data.lapTime);
         lapTime(data);
     });
     socket.on('throttle', function (data) {
-        console.log(data);
+        //console.log(data);
         updateThrottle(data);
+        if (options.fueluse > 0) {
+            updateFuel(data);
+        }
+        if (options.tyreuse > 0) {
+            updateTyres(data);
+        }
     });
     socket.on('pit start', function (data) {
-        console.log(data);
+        console.log('Pit Stop: lane '+data.lane);
         pitLog[data.lane] = new PitStop(data);
         pitLog[data.lane].start();
     });
@@ -98,7 +120,7 @@ window.addEventListener('load', function() {
         pitLog[data.lane].exit();
     });
     socket.on('ble status', function (data) {
-        console.log(data);
+        console.log('Pit Exit: lane '+data.lane);
         if (data.fn == 'error') {
             showErrorPanel();
         }
@@ -131,8 +153,8 @@ function lapTime(data) {
                                 <span class="avgSpd">${avgSpeed}</span>
                                 <span class="fastestLap"></span></div>
                             </li>`;                   
-    let diff = new Date(data.lapTime).toISOString().slice(17, -1);   
-    let runtime = new Date(data.raceTime).toISOString().slice(14, -1); 
+    let diff = new Date(data.lapTime).toISOString().slice(17, 22);   
+    let runtime = new Date(data.raceTime).toISOString().slice(14, 22); 
     let seconds = data.lapTime/1000;
     let mps = options.tracklen / seconds; // Calc Meters per second to convert into chosen speed
     let speed = 0;
@@ -284,7 +306,7 @@ function updateThrottle(data) {
         let throtval = val;
         percent = Math.round(((throtval - MIN_T) * 100) / (MAX_T - MIN_T));
         ticksnum = Math.round(percent / 5);
-        console.log('Val: '+throtval+'  |  Percent: '+percent+'%  |  ticks: '+ticksnum);
+        //console.log('Val: '+throtval+'  |  Percent: '+percent+'%  |  ticks: '+ticksnum);
         var count = 0;
         if (ticksnum > lastticksnum[idx]) {
             let diff = ticksnum - lastticksnum[idx];
@@ -312,6 +334,43 @@ function updateThrottle(data) {
     });
 }
 
+function updateFuel(data) {
+    data.forEach((val, idx) => {
+        let lane = idx+1;
+        let laneRef = 'lane'+lane;
+        var used = 0;
+        if (val > 0) {
+            used = Math.round(((val / options.fueluse) * ((val / 10 )/2)) * 10) / 10;
+            console.log(used);
+        }
+        let current = options.lapCount[laneRef].telemetry.fuelBurn.current;
+        let newFuel = Math.round((current - used) * 10) / 10;
+        options.lapCount[laneRef].telemetry.fuelBurn.current = newFuel;
+        if (newFuel >= 50) { //
+            fuelObj[idx].classList.remove('amber','red');
+            fuelObj[idx].classList.add('green');
+        }
+        if (newFuel < 50) { //
+            fuelObj[idx].classList.add('amber');
+            fuelObj[idx].classList.remove('red','green');
+        }
+        if (newFuel < 30) { // Warning to pit
+            fuelObj[idx].classList.add('red');
+            fuelObj[idx].classList.remove('amber');
+        }
+        if (newFuel < 0) { // Ran out of fuel - End race
+        }
+        var ticks = fuelObj[idx].querySelectorAll('.tick');
+        let ticksnum = Math.ceil(newFuel / 10);
+        //console.log('lane: '+lane+'  |  current: '+current+'  |  used: '+used+'  |  newFuel: '+newFuel+'  |  ticks: '+ticksnum);
+        for (var i=0; i < 10; i++) {
+            ticks[i].classList.add('on');
+            if (i >= ticksnum) {
+                ticks[i].classList.remove('on');
+            }
+        }
+    });
+}
 
 /* Functions below are UI interaction/Animation related  */
 
@@ -428,14 +487,13 @@ function saveOptions() {
     options.player1 = p1.value;  // Driver names
     options.player2 = p2.value;
     options.lights = (lightSwitch.checked) ?  true : false;  // Starting Lights
-    options.fueluse = (fuelToogle.checked) ?  true : false;  // Fuel use
-    options.tyrewear = (tyreToogle.checked) ?  true : false;  // Tyre wear
+    options.fueluse = parseInt(fuelToogle.options[fuelToogle.selectedIndex].value);  // Fuel use rate
+    options.tyrewear = parseInt(tyreToogle.options[tyreToogle.selectedIndex].value);  // Tyre wear rate
     options.units = speedUnit.options[speedUnit.selectedIndex].value;  // Speed units
     options.speed = speedScale.options[speedScale.selectedIndex].value;  // Speed scale
     options.tracklen = trackLength.value; // Track lenth in Meters
     updatePlayers();
     resetLapCount();
-    console.table(options);
     closeOptions();
 }
 function updatePlayers() {
@@ -449,21 +507,34 @@ function resetLapCount() {
             raceTimes: [0],
             avgSpeeds: [0],
             throttle: [], // Future use
-            fuelBurn: [],
-            tyreWear: []
+            fuelBurn: {
+                current: 100,
+                logs: []
+            },
+            tyreWear: {
+                current: 100,
+                logs: []
+            }
         }},
         lane2: { count: 0, pb: 99999999, telemetry: {
             lapTimes: [0],
             raceTimes: [0],
             avgSpeeds: [0],
             throttle: [], // Future use
-            fuelBurn: [],
-            tyreWear: []
+            fuelBurn: {
+                current: 100,
+                logs: []
+            },
+            tyreWear: {
+                current: 100,
+                logs: []
+            }
         }}
     };
     options.fastest = 99999999;
     document.querySelector('#lane1 .lap-count').innerHTML = lapCountEl({count: 0});
     document.querySelector('#lane2 .lap-count').innerHTML = lapCountEl({count: 0});
+    updateFuel([0,0]);
 }
 function enterGame() {
     updatePlayers();

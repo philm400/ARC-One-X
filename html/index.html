@@ -95,7 +95,7 @@
                     <nav class="controls">
                         <a href="#" class="btn blue" onClick="raceOptions();"><span>Race Options</span></a>
                         <a href="#" class="btn green" onClick="startRace();"><span>Start</span></a>
-                        <a href="#" class="btn red" onClick="stopRace();"><span>Stop &amp; Reset</span></a>
+                        <a href="#" class="btn red" onClick="stopRace();"><span>Stop</span></a>
                         <a href="#" class="btn yellow" onClick="resetRace();"><span>Reset</span></a>
                         <a href="#" class="btn yellow devOnly" onClick="devLap(1);"><span>Lap - L1</span></a>
                         <a href="#" class="btn yellow devOnly" onClick="devLap(2);"><span>Lap - L2</span></a>
@@ -204,18 +204,22 @@
                         </label>
                     </div>
                     <div class="form-row">
-                        <label>Fuel Usage</label>
-                        <label class="switch">
-                            <input type="checkbox" id="fuel-toggle">
-                            <span class="slider"></span>
-                        </label>
+                        <label for="i-fuelrate">Fuel Usage</label>
+                        <select class="select-css" id="i-fuelrate">
+                            <option value="0" selected>Off</option>
+                            <option value="200">Low</option>
+                            <option value="150">Medium</option>
+                            <option value="75">High</option>
+                        </select>
                     </div>
                     <div class="form-row">
-                        <label>Tyre Wear</label>
-                        <label class="switch">
-                            <input type="checkbox" id="tyres-toggle">
-                            <span class="slider"></span>
-                        </label>
+                        <label for="i-tyrerate">Tyre Wear</label>
+                        <select class="select-css" id="i-tyrerate">
+                            <option value="0" selected>Off</option>
+                            <option value="200">Low</option>
+                            <option value="150">Medium</option>
+                            <option value="75">High</option>
+                        </select>
                     </div>
                     <div class="form-row">
                         <label for="i-trackLen">Track Length</label>
