@@ -97,6 +97,9 @@
   .op-25 {
       opacity: 0.25;
   }
+  .op-15 {
+	opacity: 0.15;
+  }
   
   #logo {
       z-index: 3;
@@ -151,6 +154,9 @@
       height: 100vh;
       align-items: stretch;
       padding: 130px 0 50px;
+  }
+  .blur {
+      filter: blur(8px);
   }
   .bkg-blur {
       background: rgba(0, 0, 0, 0.35);
@@ -465,8 +471,9 @@ svg .icon {
   .pitIndicator img {
 	margin: 0 0 3rem;
   }
+  .pitIndicator .boxbox,
   .pitIndicator .inPit {
-	animation: pitFlash 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+	animation: pitFlash 0.5s cubic-bezier(0, 0.2, 0.8, 1) infinite;
   }
   .pitIndicator .pitProgress {
 	  width: 75%;

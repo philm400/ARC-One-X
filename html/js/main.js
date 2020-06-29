@@ -13,36 +13,7 @@ var options = {
     speed: 'scaled up',
     tracklen: 2.2,
     fastest: 99999999,
-    lapCount: {
-        lane1: { count: 0, pb: 99999999, telemetry: {
-            lapTimes: [0],
-            raceTimes: [0],
-            avgSpeeds: [0],
-            throttle: [0], // Future use
-            fuelBurn: {
-                current: 100,
-                logs: []
-            },
-            tyreWear: {
-                current: 100,
-                logs: []
-            }
-        }},
-        lane2: { count: 0, pb: 99999999, telemetry: {
-            lapTimes: [0],
-            raceTimes: [0],
-            avgSpeeds: [0],
-            throttle: [], // Future use
-            fuelBurn: {
-                current: 100,
-                logs: []
-            },
-            tyreWear: {
-                current: 100,
-                logs: []
-            }
-        }}
-    },
+    lapCount: {}, // Defined by the resetLapCount() function
     deviceInfo: {}
 };
 const MAX_T = 62;
@@ -84,6 +55,10 @@ var fuelObj = [
      document.querySelector('#lane1 .fuelGauge'),
      document.querySelector('#lane2 .fuelGauge')
 ]
+var tyreObj = [
+     document.querySelectorAll('#lane1 .tyreWear .tyre'),
+     document.querySelectorAll('#lane2 .tyreWear .tyre')
+]
 var pitLog = [0,0,0];
 var pitTimers = [0,0,0];
 
@@ -94,6 +69,8 @@ var pitTimers = [0,0,0];
 } */
 
 window.addEventListener('load', function() {
+    pitLog[1] = new PitStop({lane: 1});
+    pitLog[2] = new PitStop({lane: 2});
     console.log('Page Loaded')
     socket = io(); // Initialise socket.io-client to connect to host
     socket.on('lap', function (data) {
@@ -106,21 +83,20 @@ window.addEventListener('load', function() {
         if (options.fueluse > 0) {
             updateFuel(data);
         }
-        if (options.tyreuse > 0) {
+        if (options.tyrewear > 0) {
             updateTyres(data);
         }
     });
     socket.on('pit start', function (data) {
         console.log('Pit Stop: lane '+data.lane);
-        pitLog[data.lane] = new PitStop(data);
         pitLog[data.lane].start();
     });
     socket.on('pit exit', function (data) {
-        console.log(data);
+        console.log('Pit Exit: lane '+data.lane);
         pitLog[data.lane].exit();
     });
     socket.on('ble status', function (data) {
-        console.log('Pit Exit: lane '+data.lane);
+        console.log(data);
         if (data.fn == 'error') {
             showErrorPanel();
         }
@@ -341,7 +317,7 @@ function updateFuel(data) {
         var used = 0;
         if (val > 0) {
             used = Math.round(((val / options.fueluse) * ((val / 10 )/2)) * 10) / 10;
-            console.log(used);
+            console.log('fuel used: '+used);
         }
         let current = options.lapCount[laneRef].telemetry.fuelBurn.current;
         let newFuel = Math.round((current - used) * 10) / 10;
@@ -356,9 +332,14 @@ function updateFuel(data) {
         }
         if (newFuel < 30) { // Warning to pit
             fuelObj[idx].classList.add('red');
-            fuelObj[idx].classList.remove('amber');
+            fuelObj[idx].classList.remove('amber');            
+            if (!options.lapCount[laneRef].telemetry.boxbox) {
+                pitLog[laneRef] = new PitStop({lane: lane});
+                pitLog[laneRef].boxbox();
+            }
         }
-        if (newFuel < 0) { // Ran out of fuel - End race
+        if (newFuel <= 0) { // Ran out of fuel - End race
+            
         }
         var ticks = fuelObj[idx].querySelectorAll('.tick');
         let ticksnum = Math.ceil(newFuel / 10);
@@ -370,6 +351,69 @@ function updateFuel(data) {
             }
         }
     });
+}
+
+function updateTyres(data) {
+    data.forEach((val, idx) => {
+        let lane = idx+1;
+        let laneRef = 'lane'+lane;
+        var used = []; // rl, fl, fr, rr
+        if (val > 0) {
+            for (i=0; i<=3; i++) {
+                var rand = randNum(val/1.25, val*1.5); // random variations to each tyre
+                used.push(Math.round(((rand / options.tyrewear) * ((val / 10 )/2)) * 10) / 10);
+                let current = options.lapCount[laneRef].telemetry.tyreWear.current[i];
+                let newWear = Math.round((current - used[i]) * 10) / 10;
+                options.lapCount[laneRef].telemetry.tyreWear.current[i] = newWear;
+            }
+            console.log('tyres used: '+used);
+        }
+        let newWear = options.lapCount[laneRef].telemetry.tyreWear.current;
+        for (i=0; i<=3; i++) { // loop and update tyres
+            tyreObj[idx][i].classList.add('on');
+            if (newWear[i] >= 65) { //
+                tyreObj[idx][i].classList.remove('amber','red');
+                tyreObj[idx][i].classList.add('green');
+            }
+            if (newWear[i] < 65) { //
+                tyreObj[idx][i].classList.add('amber');
+                tyreObj[idx][i].classList.remove('red','green');
+            }
+            if (newWear[i] < 30) { // Warning to pit
+                tyreObj[idx][i].classList.add('red');
+                tyreObj[idx][i].classList.remove('amber');
+                if (!options.lapCount[laneRef].telemetry.boxbox) {
+                    pitLog[laneRef].boxbox();
+                }
+            }
+            if (newWear[i] <= 0) { // Tyre blow out
+                tyreObj[idx][i].classList.remove('red','amber','green');
+            }
+        }
+    });
+}
+
+function fuelOff(data = [0,0]) {
+    data.forEach((val, idx) => {
+        fuelObj[idx].classList.remove('amber','red');
+        fuelObj[idx].classList.add('green');
+        var ticks = fuelObj[idx].querySelectorAll('.tick');
+        for (var i=0; i < 10; i++) {
+            ticks[i].classList.remove('on');
+        }       
+    });
+}
+
+function tyresOff(data = [0,0]) {
+    data.forEach((val, idx) => {
+        for (i=0; i<=3; i++) { // loop and update tyres
+            tyreObj[idx][i].classList.remove('red','amber','green','on');
+        }
+    });
+}
+
+function boxbox() {
+
 }
 
 /* Functions below are UI interaction/Animation related  */
@@ -472,7 +516,7 @@ function closeError() {     // close error panel
     }
 }
 
-/* OPTIONS FUNCTIONS */
+/* OPTIONS PANEL FUNCTIONS */
 function addLap() {
     var laps = parseInt(lapOption.value) + 1;
     lapOption.value = laps;
@@ -488,6 +532,9 @@ function saveOptions() {
     options.player2 = p2.value;
     options.lights = (lightSwitch.checked) ?  true : false;  // Starting Lights
     options.fueluse = parseInt(fuelToogle.options[fuelToogle.selectedIndex].value);  // Fuel use rate
+    if (options.fueluse == 0) {
+        fuelOff();
+    }
     options.tyrewear = parseInt(tyreToogle.options[tyreToogle.selectedIndex].value);  // Tyre wear rate
     options.units = speedUnit.options[speedUnit.selectedIndex].value;  // Speed units
     options.speed = speedScale.options[speedScale.selectedIndex].value;  // Speed scale
@@ -503,30 +550,32 @@ function updatePlayers() {
 function resetLapCount() {
     options.lapCount = {
         lane1: { count: 0, pb: 99999999, telemetry: {
+            boxbox: false,
             lapTimes: [0],
             raceTimes: [0],
             avgSpeeds: [0],
-            throttle: [], // Future use
+            throttle: [],
             fuelBurn: {
                 current: 100,
-                logs: []
+                logs: [] // Future use
             },
             tyreWear: {
-                current: 100,
+                current: [100,100,100,100],
                 logs: []
             }
         }},
         lane2: { count: 0, pb: 99999999, telemetry: {
+            boxbox: false,
             lapTimes: [0],
             raceTimes: [0],
             avgSpeeds: [0],
-            throttle: [], // Future use
+            throttle: [],
             fuelBurn: {
                 current: 100,
-                logs: []
+                logs: [] // Future use
             },
             tyreWear: {
-                current: 100,
+                current: [100,100,100,100],
                 logs: []
             }
         }}
@@ -534,7 +583,16 @@ function resetLapCount() {
     options.fastest = 99999999;
     document.querySelector('#lane1 .lap-count').innerHTML = lapCountEl({count: 0});
     document.querySelector('#lane2 .lap-count').innerHTML = lapCountEl({count: 0});
-    updateFuel([0,0]);
+    if (options.fueluse > 0) {
+        updateFuel([0,0]);
+    } else {
+        fuelOff();
+    }
+    if (options.tyrewear > 0) {
+        updateTyres([0,0]);
+    } else {
+        tyresOff();
+    }
 }
 function enterGame() {
     updatePlayers();
@@ -577,9 +635,21 @@ preloadAudio(
     "/audio/beep--04-1.m4a",
     "/audio/beep--03-1.m4a",
     "/audio/gt.m4a",
-    "/audio/lap-2.m4a"
+    "/audio/lap-2.m4a",
+    "/audio/boxbox.m4a"
 )
 
 function devMode() {
     document.body.classList.toggle('devModeOn');
 }
+function randNum(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+function demo() {
+    setInterval(() => {
+        data = [randNum(23, 64),randNum(23, 64)];
+        //updateFuel(data);
+        updateTyres(data);
+    }, 300);
+} 
