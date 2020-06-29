@@ -37,6 +37,10 @@ const p1 = document.querySelector('#i-player1');
 const p2 = document.querySelector('#i-player2');
 const l1 = document.querySelector('#lane1');
 const l2 = document.querySelector('#lane2');
+const laneDOM = [0, document.querySelector('#lane1'),
+                    document.querySelector('#lane2')];
+const lapsList = [0, document.querySelector("#console_lane_1"),
+                     document.querySelector("#console_lane_2")];
 const lightSwitch = document.querySelector('#lights-toggle');
 const fuelToogle = document.querySelector('#i-fuelrate');
 const tyreToogle = document.querySelector('#i-tyrerate');
@@ -47,35 +51,35 @@ const logo = document.querySelector('#logo');
 const startBtn = document.querySelector('#enter-game-btn');
 const loaderRipp = document.querySelector('.loaderRipple');
 const lapCountEl = (data) => `${data.count}/<small>${options.laps}</small>`; 
-var throtObj = [
+const throtObj = [
      document.querySelector('#lane1 .throttle'),
      document.querySelector('#lane2 .throttle')
 ]
-var fuelObj = [
+const fuelObj = [
      document.querySelector('#lane1 .fuelGauge'),
      document.querySelector('#lane2 .fuelGauge')
 ]
-var tyreObj = [
+const tyreObj = [
      document.querySelectorAll('#lane1 .tyreWear .tyre'),
      document.querySelectorAll('#lane2 .tyreWear .tyre')
 ]
-var pitLog = [0,0,0];
+var LANES = [0,0,0];
 var pitTimers = [0,0,0];
 
 /* function pi(data) {
     console.log(data);
-    pitLog[data.lane] = new PitStop(data);
-    pitLog[data.lane].start();
+    LANES[data.lane] = new PitStop(data);
+    LANES[data.lane].start();
 } */
 
 window.addEventListener('load', function() {
-    pitLog[1] = new PitStop({lane: 1});
-    pitLog[2] = new PitStop({lane: 2});
+    LANES[1] = new Lane({lane: 1});
+    LANES[2] = new Lane({lane: 2});
     console.log('Page Loaded')
     socket = io(); // Initialise socket.io-client to connect to host
     socket.on('lap', function (data) {
         console.log('Lap: '+data.lapTime);
-        lapTime(data);
+        LANES[data.lane].newLap(data);
     });
     socket.on('throttle', function (data) {
         //console.log(data);
@@ -89,11 +93,11 @@ window.addEventListener('load', function() {
     });
     socket.on('pit start', function (data) {
         console.log('Pit Stop: lane '+data.lane);
-        pitLog[data.lane].start();
+        LANES[data.lane].pitStart();
     });
     socket.on('pit exit', function (data) {
         console.log('Pit Exit: lane '+data.lane);
-        pitLog[data.lane].exit();
+        LANES[data.lane].pitExit();
     });
     socket.on('ble status', function (data) {
         console.log(data);
@@ -115,97 +119,15 @@ window.addEventListener('load', function() {
 });
 
 const timerEl = document.querySelector("#timer_lane_1");
-const lapsLane1 = document.querySelector("#console_lane_1");
-const lapsLane2 = document.querySelector("#console_lane_2");
 var parser = new DOMParser();
+
 var worker = new Worker('/js/timer-worker.js'); // Threaded JS Worker
+    worker.onmessage = function(e) {
+        if(e.data.function == 'timer') {
+            updateTimer(new Date(e.data.value).toISOString().slice(14, 21));
+        }
+    }
 
-function lapTime(data) {
-    console.log('Log Lap: '+data)
-    var lapElement = () => `<li class="lap"><div>
-                                <span class="lapNum">${data.lapCount}</span>
-                                <span class="lapTime">${diff}</span>
-                                <span class="raceTime">${runtime}</span>
-                                <span class="avgSpd">${avgSpeed}</span>
-                                <span class="fastestLap"></span></div>
-                            </li>`;                   
-    let diff = new Date(data.lapTime).toISOString().slice(17, 22);   
-    let runtime = new Date(data.raceTime).toISOString().slice(14, 22); 
-    let seconds = data.lapTime/1000;
-    let mps = options.tracklen / seconds; // Calc Meters per second to convert into chosen speed
-    let speed = 0;
-    if (options.units == 'mph') { // MPH
-        speed = mps * 2.237;
-    } else if (options.units == 'kph') { // KPH
-        speed = mps * 3.6;
-    } else { // MPS
-        speed = mps;
-    }
-    if (options.speed == 'scaled up') {
-        speed = speed * 32;
-    }
-    let avgSpeed = speed.toFixed(1) + '<small> '+options.units+'</small>';       
-    let li = parser.parseFromString(lapElement(), 'text/html');
-    audio[3].currentTime = 0;
-    audio[3].play();
-    if (data.lane == 1) {
-        var lapCount = options.lapCount.lane1.count += 1; // update lane lap counter
-        document.querySelector('#lane1 .lap-count').innerHTML = lapCountEl({count: lapCount});
-        if (lapCount > options.lapCount.lane2.count) {
-            l1.classList.remove('last');
-            l1.classList.add('first');
-            l2.classList.add('last');
-        }
-        lapsLane1.prepend(li.body.firstChild);
-        updateFastestLap(1,data.lapTime)
-        if (lapCount == options.laps) { // check if winner and end race
-            endRace(1);
-        }
-        // Add telemetry data to log
-        options.lapCount.lane1.telemetry.lapTimes.push(seconds);
-        options.lapCount.lane1.telemetry.raceTimes.push(data.raceTime / 1000);
-        options.lapCount.lane1.telemetry.avgSpeeds.push(speed.toFixed(1));
-    } else if (data.lane == 2) {
-        var lapCount = options.lapCount.lane2.count += 1; // update lane lap counter
-        document.querySelector('#lane2 .lap-count').innerHTML = lapCountEl({count: lapCount});
-        if (lapCount > options.lapCount.lane1.count) {
-            l2.classList.remove('last');
-            l2.classList.add('first');
-            l1.classList.add('last');
-        }
-        lapsLane2.prepend(li.body.firstChild);
-        updateFastestLap(2,data.lapTime)
-        if (lapCount == options.laps) { // check for winner and end race
-            endRace(2);
-        }
-        // Add telemetry data to log
-        options.lapCount.lane2.telemetry.lapTimes.push(seconds);
-        options.lapCount.lane2.telemetry.raceTimes.push(data.raceTime / 1000);
-        options.lapCount.lane2.telemetry.avgSpeeds.push(speed.toFixed(1));
-    }                 
-}
-
-function pitStopEnd(data) {
-    var pitFlag,lapData;
-    if (data.lane == 1) {
-        lapData = document.querySelector('#console_lane_1');
-        pitFlag = l1.querySelector('.pitIndicator');
-    } else {
-        lapData = document.querySelector('#console_lane_2');
-        pitFlag = l2.querySelector('.pitIndicator');
-    }
-    let pitCrew = pitFlag.querySelector('.pitProgress .bar');
-    lapData.classList.remove('hide');
-    pitFlag.classList.remove('flex');
-    pitFlag.querySelector('.inPit').classList.remove('hide');
-    pitFlag.querySelector('.gogogo').classList.add('hide');
-}
-
-worker.onmessage = function(e) {
-    if(e.data.function == 'timer') {
-        updateTimer(new Date(e.data.value).toISOString().slice(14, 21));
-    }
-}
 function updateTimer(time) {
     timerEl.innerHTML = time;
 }
@@ -240,8 +162,8 @@ function resetRace() {
     worker.postMessage({function: 'reset'}); // reset the timer in worker.
     updateTimer(new Date(0).toISOString().slice(14, 21));
     resetLapCount();
-    lapsLane1.innerHTML = '';
-    lapsLane2.innerHTML = '';
+    lapsList[1].innerHTML = '';
+    lapsList[2].innerHTML = '';
     document.querySelector("#lane1").classList.remove('winner','last','first'); // remove race classes to reset
     document.querySelector("#lane2").classList.remove('winner','last','first'); // remove race classes to reset
     worker.postMessage({function: 'reset'}); // reset the race.
@@ -252,7 +174,7 @@ function updateFastestLap(lane, data) {
             options.lapCount.lane1.pb = data
             pbel = l1.querySelector('.pb') !== null
                 if (pbel) { l1.querySelector('.pb').classList.remove('pb'); }
-            lapsLane1.firstChild.classList.add('pb');
+                lapsList[1].firstChild.classList.add('pb');
         }
     }
     if (lane == 2) {  // Handle personal best lap logic
@@ -260,7 +182,7 @@ function updateFastestLap(lane, data) {
             options.lapCount.lane2.pb = data
             pbel = l2.querySelector('.pb') !== null
                 if (pbel) { l2.querySelector('.pb').classList.remove('pb'); }
-            lapsLane2.firstChild.classList.add('pb');
+                lapsList[2].firstChild.classList.add('pb');
         }
     }
     var fastestLap = document.querySelector('.fastest');
@@ -270,9 +192,9 @@ function updateFastestLap(lane, data) {
             fastestLap.classList.remove('fastest');
         }
         if (lane == 1) {
-            lapsLane1.firstChild.classList.add('fastest');
+            lapsList[1].firstChild.classList.add('fastest');
         } else {
-            lapsLane2.firstChild.classList.add('fastest');
+            lapsList[2].firstChild.classList.add('fastest');
         }
     }
 }
@@ -334,8 +256,8 @@ function updateFuel(data) {
             fuelObj[idx].classList.add('red');
             fuelObj[idx].classList.remove('amber');            
             if (!options.lapCount[laneRef].telemetry.boxbox) {
-                pitLog[laneRef] = new PitStop({lane: lane});
-                pitLog[laneRef].boxbox();
+                //LANES[laneRef] = new Lane({lane: lane});
+                LANES[laneRef].boxbox();
             }
         }
         if (newFuel <= 0) { // Ran out of fuel - End race
@@ -383,7 +305,7 @@ function updateTyres(data) {
                 tyreObj[idx][i].classList.add('red');
                 tyreObj[idx][i].classList.remove('amber');
                 if (!options.lapCount[laneRef].telemetry.boxbox) {
-                    pitLog[laneRef].boxbox();
+                    LANES[laneRef].boxbox();
                 }
             }
             if (newWear[i] <= 0) { // Tyre blow out
