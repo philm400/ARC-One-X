@@ -168,36 +168,6 @@ function resetRace() {
     document.querySelector("#lane2").classList.remove('winner','last','first'); // remove race classes to reset
     worker.postMessage({function: 'reset'}); // reset the race.
 }
-function updateFastestLap(lane, data) {
-    if (lane == 1) {  // Handle personal best lap logic
-        if (data < options.lapCount.lane1.pb) {
-            options.lapCount.lane1.pb = data
-            pbel = l1.querySelector('.pb') !== null
-                if (pbel) { l1.querySelector('.pb').classList.remove('pb'); }
-                lapsList[1].firstChild.classList.add('pb');
-        }
-    }
-    if (lane == 2) {  // Handle personal best lap logic
-        if (data < options.lapCount.lane2.pb) {
-            options.lapCount.lane2.pb = data
-            pbel = l2.querySelector('.pb') !== null
-                if (pbel) { l2.querySelector('.pb').classList.remove('pb'); }
-                lapsList[2].firstChild.classList.add('pb');
-        }
-    }
-    var fastestLap = document.querySelector('.fastest');
-    if (data < options.fastest) { // Handle fastest lap logic
-        options.fastest = data;
-        if (fastestLap !== null) {
-            fastestLap.classList.remove('fastest');
-        }
-        if (lane == 1) {
-            lapsList[1].firstChild.classList.add('fastest');
-        } else {
-            lapsList[2].firstChild.classList.add('fastest');
-        }
-    }
-}
 
 function updateThrottle(data) {
     data.forEach((val, idx) => {

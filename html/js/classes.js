@@ -7,8 +7,8 @@ class Lane {
         this.anim = '';
     }
     newLap(data) {
-        console.log('Log Lap: '+data)
-        console.log(data)
+        //console.log('Log Lap: '+data)
+        //console.log(data)
         var lapElement = () => `<li class="lap"><div>
                                     <span class="lapNum">${data.lapCount}</span>
                                     <span class="lapTime">${diff}</span>
@@ -38,13 +38,13 @@ class Lane {
         data.other = (data.lane == 1) ? 2 : 1;
         var lapCount = options.lapCount['lane'+data.lane].count += 1; // update lane lap counter
         document.querySelector('#lane'+data.lane+' .lap-count').innerHTML = lapCountEl({count: lapCount});
-        if (lapCount > options.lapCount.lane2.count) {
+        if (lapCount > options.lapCount['lane'+data.lane].count) {
             laneDOM[data.lane].classList.remove('last');
             laneDOM[data.lane].classList.add('first');
             laneDOM[data.other].classList.add('last');
         }
         lapsList[data.lane].prepend(li.body.firstChild);
-        updateFastestLap(data.lane, data.lapTime)
+        this.updateFastestLap(data.lane, data.lapTime)
         if (lapCount == options.laps) { // check if winner and end race
             endRace(data.lane);
         }
@@ -52,6 +52,22 @@ class Lane {
         options.lapCount['lane'+data.lane].telemetry.lapTimes.push(seconds);
         options.lapCount['lane'+data.lane].telemetry.raceTimes.push(data.raceTime / 1000);
         options.lapCount['lane'+data.lane].telemetry.avgSpeeds.push(speed.toFixed(1));
+    }
+    updateFastestLap(lane, data) {
+        if (data < options.lapCount['lane'+lane].pb) {
+            options.lapCount['lane'+lane].pb = data
+            let pbel = laneDOM[lane].querySelector('.pb') !== null
+                if (pbel) { aneDOM[lane].querySelector('.pb').classList.remove('pb'); }
+                lapsList[lane].firstChild.classList.add('pb');
+        }
+        var fastestLap = document.querySelector('.fastest');
+        if (data < options.fastest) { // Handle fastest lap logic
+            options.fastest = data;
+            if (fastestLap !== null) {
+                fastestLap.classList.remove('fastest');
+            }
+            lapsList[lane].firstChild.classList.add('fastest');
+        }
     }
     pitStart() {
         console.log(test);
