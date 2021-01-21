@@ -11,7 +11,7 @@
   "dependencies": {
     "@abandonware/noble": "^1.9.2-9",
     "express": "^4.17.1",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.4.0"
   },
   "devDependencies": {
     "browser-sync": "^2.26.7",
