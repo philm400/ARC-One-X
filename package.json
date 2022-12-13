@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@abandonware/noble": "^1.9.2-9",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
